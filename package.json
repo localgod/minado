@@ -1,0 +1,35 @@
+{
+  "name": "minado",
+  "version": "1.0.0",
+  "description": "Collection of tools use for automating scrum processes.",
+  "license": "MIT",
+  "main": "bin/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx eslint . --ext .js --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/localgod/minado.git"
+  },
+  "author": "Johanns Skov Frandsen",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.0",
+    "cli-progress": "^3.9.0",
+    "config": "^3.3.6",
+    "gherkin-parse": "^1.0.5",
+    "glob": "^7.1.6",
+    "handlebars": "^4.7.7",
+    "highlight.js": "^10.7.2",
+    "nano": "^9.0.3",
+    "simple-grep": "0.0.1",
+    "tunnel": "0.0.6",
+    "yargs": "^16.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.24.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}

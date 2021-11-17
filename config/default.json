@@ -1,0 +1,29 @@
+{
+  "confluence": {
+    "host": "https://confluence/wiki/",
+    "space": {
+      "key": "KEY"
+    }
+  },
+  "jira": {
+    "host": "https://jira/jira/",
+    "project": {
+      "key": "KEY"
+    }
+  },
+  "bitbucket": {
+    "host": "https://bitbucket/",
+    "project": {
+      "key": "KEY"
+    }
+  },
+  "github": {
+    "host": "https://api.github.com:443",
+    "org": {
+      "key": "org"
+    },
+    "team": {
+      "key": "team"
+    }
+  }
+}

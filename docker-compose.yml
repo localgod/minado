@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  dev:
+    image: node:latest
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    working_dir: /tmp
+    ports:
+      - "3000:3000"
+    environment:
+      AD_USERNAME: ${AD_USERNAME}
+      AD_PASSWORD: ${AD_PASSWORD}
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      GITHUB_USER: ${GITHUB_USER}
+      GITHUB_PASS: ${GITHUB_PASS}
+    volumes:
+        - type: bind
+          source: ./
+          target: /workspace
+    network_mode: host
+
+
+  couchdb:
+    image: couchdb:latest
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    ports:
+     - "5984:5984"
+    volumes:
+     - type: bind
+       source: ./data
+       target: /opt/couchdb/data
+    network_mode: host

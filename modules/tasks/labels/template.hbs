@@ -1,0 +1,37 @@
+<ac:structured-macro ac:name="chart" ac:schema-version="1" ac:macro-id="ef9afcec-9fe7-4801-aacd-262d8efa0883">
+    <ac:parameter ac:name="3D">true</ac:parameter>
+    <ac:parameter ac:name="imageFormat">png</ac:parameter>
+    <ac:parameter ac:name="orientation">horizontal</ac:parameter>
+    <ac:parameter ac:name="dataDisplay">after</ac:parameter>
+    <ac:parameter ac:name="dataOrientation">horizontal</ac:parameter>
+    <ac:parameter ac:name="title">Labels used on Jira issues</ac:parameter>
+    <ac:parameter ac:name="subTitle">Number of occurences</ac:parameter>
+    <ac:parameter ac:name="type">bar</ac:parameter>
+    <ac:parameter ac:name="legend">false</ac:parameter>
+    <ac:parameter ac:name="height">300</ac:parameter>
+    <ac:parameter ac:name="width">600</ac:parameter>
+    <ac:rich-text-body>
+        <table class="wrapped">
+            <colgroup>
+                <col />
+                <col />
+            </colgroup>
+            <tbody>
+                <tr>
+                    <th colspan="1">Label</th>
+                    <td colspan="1">Occurrences</td>
+                </tr>
+                {{#each labels}}
+                <tr>
+                    <th>
+                        {{ this.label }}
+                    </th>
+                    <td>
+                        {{ this.count }}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </ac:rich-text-body>
+</ac:structured-macro>
