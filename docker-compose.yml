@@ -4,8 +4,6 @@ services:
     image: node:latest
     command: /bin/sh -c "while sleep 1000; do :; done"
     working_dir: /tmp
-    ports:
-      - "3000:3000"
     environment:
       AD_USERNAME: ${AD_USERNAME}
       AD_PASSWORD: ${AD_PASSWORD}
@@ -31,4 +29,3 @@ services:
      - type: bind
        source: ./data
        target: /opt/couchdb/data
-    network_mode: host

@@ -10,7 +10,6 @@
 	"service": "dev",
 	"workspaceFolder": "/workspace",
 	"settings": {
-		"terminal.integrated.shell.linux": null
 	},
 	"extensions": []
 }
