@@ -1,6 +1,7 @@
 'use strict';
 import Template from '../../Template.js';
 import CouchDB from '../../couchdb/CouchDb.js';
+import config from 'config';
 /**
  * Generate a epic overview and publish it to Confluence
  */
@@ -37,8 +38,9 @@ export default class LabelOverview {
       b.sort((a, b) => (a.count < b.count) ? 1 : -1);
 
       const template = new Template();
+      const parentId = config.get('confluence').space.rootPageId;
       template.setPageTitle('Labels overview');
-      template.setParentId(182217395);
+      template.setParentId(parentId);
       template.setTemplatePath(`${this.cwd}/template.hbs`);
       return template.write({labels: b});
     });

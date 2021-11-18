@@ -42,7 +42,7 @@ export default class Bitbucket {
         data: response.data,
       };
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
   }
 };

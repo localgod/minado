@@ -23,7 +23,7 @@ export default class Git {
     const path = `./repos/${repo}`;
     return e(`git clone ${url} ${path}`).catch((error) => {
       if (!error.stderr.includes('already exists')) {
-        console.log(error);
+        console.error(error);
       } else {
         return {
           name: repo,

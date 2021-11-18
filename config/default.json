@@ -2,13 +2,17 @@
   "confluence": {
     "host": "https://confluence/wiki/",
     "space": {
-      "key": "KEY"
+      "key": "KEY",
+      "rootPageId": 123456789
     }
   },
   "jira": {
     "host": "https://jira/jira/",
     "project": {
       "key": "KEY"
+    },
+    "fieldMapping": {
+      "epicLink" : "customfield_10008"
     }
   },
   "bitbucket": {

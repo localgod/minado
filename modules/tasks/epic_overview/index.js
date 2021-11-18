@@ -30,15 +30,17 @@ export default class EpicOverview {
       });
 
       Promise.all(p).then((values) => {
+        const epicLinkfieldId = config.get('jira').fieldMapping.epicLink;
+
         const awesome = {};
         for (issue of values) {
           if (issue.data.issues.length > 0) {
             let t;
             for (t of issue.data.issues) {
-              if (awesome[t.fields.customfield_10006] == undefined) {
-                awesome[t.fields.customfield_10006] = [t.key];
+              if (awesome[t.fields[epicLinkfieldId]] == undefined) {
+                awesome[t.fields[epicLinkfieldId]] = [t.key];
               } else {
-                awesome[t.fields.customfield_10006].push(t.key);
+                awesome[t.fields[epicLinkfieldId]].push(t.key);
               }
             }
           }
@@ -59,15 +61,16 @@ export default class EpicOverview {
           }
         }
         const template = new Template();
+        const parentId = config.get('confluence').space.rootPageId;
         template.setPageTitle('Epic overview');
-        template.setParentId(182217395);
+        template.setParentId(parentId);
         template.setTemplatePath(`${this.cwd}/template.hbs`);
         return template.write(
             {notice: NoteMacro.generate('Generated', msg), epics: epics},
         );
       });
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
       this.log.error('Something bad happend Jira fethcing');
     });
   }

@@ -25,7 +25,7 @@ export default class Sync {
       this.syncJiraToCouch();
       // this.updateAllDatabaseEntries();
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
   }
 
@@ -58,14 +58,16 @@ export default class Sync {
   }
 
   /**
-     * Fetch all issues
-     */
+   * Fetch all issues
+   */
   async syncJiraToCouch() {
+    const epicLinkfieldId = config.get('jira').fieldMapping.epicLink;
+    const projectKey = config.get('jira').project.key;
     const fields = [
-      'summary', 'issuetype', 'status', 'customfield_10006', 'labels',
+      'summary', 'issuetype', 'status', epicLinkfieldId, 'labels',
     ];
     console.time('Jira fetching');
-    const jql = `project = CCOE order by issuekey ASC`;
+    const jql = `project = ${projectKey} order by issuekey ASC`;
     const totalNumberOfissues = await this.jira.countIssues(jql);
     const pagesize = 100;
     let i = 0;

@@ -78,7 +78,7 @@ export default class Confluence {
           const webui = `${response.data['_links'].webui}`;
           this.log.info(`Created page: ${base}/${webui}`);
         }).catch((error) => {
-          console.log(error);
+          console.error(error);
           this.log.error('Something bad happend with page creation');
         });
       } else {
@@ -91,12 +91,12 @@ export default class Confluence {
               this.log.info(`Updated page: ${base}/${webui}`);
             })
             .catch((error) => {
-              console.log(error.response.data.message);
+              console.error(error.response.data.message);
               this.log.error('Something bad happend with page update');
             });
       }
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
   }
 

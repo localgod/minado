@@ -121,6 +121,7 @@ export default class Jira {
    * Fetch epic issues
    */
   async fetchEpic() {
+    const epicLinkfieldId = this.config.fieldMapping.epicLink;
     const jql = `project = ${this.config.project.key} 
                  and issuetype = epic 
                  and status != closed 
@@ -128,7 +129,7 @@ export default class Jira {
     return this.fetch(jql, 0, 1000, [
       'summary',
       'status',
-      'customfield_10006',
+      epicLinkfieldId,
     ])
         .then((response) => {
           return response.data.issues.map((issue) => {
@@ -136,7 +137,7 @@ export default class Jira {
           });
         })
         .catch((error) => {
-          console.log(error);
+          console.error(error);
         });
   }
 
@@ -145,15 +146,16 @@ export default class Jira {
    * @param {string} epic - epic issue
    */
   async fetchEpicChildren(epic) {
+    const epicLinkfieldId = this.config.fieldMapping.epicLink;
     const jql = `project = ${this.config.project.key}
                  and "epic link" = ${epic}`;
     return this.fetch(jql, 0, 1000, [
       'summary',
       'status',
-      'customfield_10006',
+      epicLinkfieldId,
     ])
         .catch((error) => {
-          console.log(error);
+          console.error(error);
         });
   }
 };

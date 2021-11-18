@@ -27,8 +27,9 @@ export default class App {
    */
   async highlight() {
     const h = new Highlight();
+    const parentId = config.get('confluence').space.rootPageId;
     return h.execute(
-        182217395,
+        parentId,
         'Highlight',
         `tf-mod-budget`,
         `test/component/gherkin/budget_behaviour.feature`,
@@ -69,7 +70,7 @@ export default class App {
         console.log(field);
       });
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
   }
 
@@ -108,7 +109,7 @@ export default class App {
     axe.get('/repos').then((response) => {
       console.log(response);
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
   }
 
