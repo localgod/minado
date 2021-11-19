@@ -8,10 +8,6 @@ yargs(hideBin(process.argv))
     }, (argv) => {
       new App(argv.dry).epicOverview();
     })
-    .command('highlight_example', 'Highlighting example', () => {
-    }, (argv) => {
-      new App(argv.dry).highlight();
-    })
     .command('sync', 'Sync jira to local couchdb', () => {
     }, (argv) => {
       new App(argv.dry).sync();
@@ -27,10 +23,6 @@ yargs(hideBin(process.argv))
     .command('jira_labels', 'List all jira labels', () => {
     }, (argv) => {
       new App(argv.dry).labels();
-    })
-    .command('dummy', 'work in progress', () => {
-    }, (argv) => {
-      new App(argv.dry).dummy();
     })
     .option('d', {
       alias: 'dry',

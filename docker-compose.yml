@@ -1,7 +1,12 @@
 version: '3.4'
 services:
   dev:
-    image: node:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        ARG VCS_REF: "latest"
+        ARG VERSION: "latest"
     command: /bin/sh -c "while sleep 1000; do :; done"
     working_dir: /tmp
     environment:
@@ -16,7 +21,6 @@ services:
           source: ./
           target: /workspace
     network_mode: host
-
 
   couchdb:
     image: couchdb:latest

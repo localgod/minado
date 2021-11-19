@@ -16,13 +16,13 @@ export default class Code {
     !data.hasOwnProperty('language') ? data.language = 'bash' : null;
     !data.hasOwnProperty('theme') ? data.theme = 'Midnight' : null;
     !data.hasOwnProperty('title') ? data.title = 'Example' : null;
-    !data.hasOwnProperty('content') ?
-      new Error('Content must be provided') : null;
+    !data.hasOwnProperty('content') ? new Error('Content must be provided') : null;
+    const macroId = '06f56d21-c0d4-496d-9551-ea1c03e7a342';
     return `
     <ac:structured-macro
      ac:name="code"
      ac:schema-version="1"
-     ac:macro-id="06f56d21-c0d4-496d-9551-ea1c03e7a342">
+     ac:macro-id="${macroId}">
       <ac:parameter ac:name="language">${data.language}</ac:parameter>
       <ac:parameter ac:name="theme">${data.theme}</ac:parameter>
       <ac:parameter ac:name="title">${data.title}</ac:parameter>

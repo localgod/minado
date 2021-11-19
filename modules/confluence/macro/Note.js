@@ -10,11 +10,12 @@ export default class Note {
    * @return {string}
    */
   static generate(title, content) {
+    const macroId = 'e9aa7714-b777-445c-9d98-c3ca6bdd48be';
     return `
     <ac:structured-macro
      ac:name="note"
      ac:schema-version="1"
-     ac:macro-id="e9aa7714-b777-445c-9d98-c3ca6bdd48be">
+     ac:macro-id="${macroId}">
     <ac:parameter ac:name="title">${title}</ac:parameter>
     <ac:rich-text-body>
     <p>${content}</p>
