@@ -132,9 +132,10 @@ export default class Jira {
       epicLinkfieldId,
     ])
         .then((response) => {
-          return response.data.issues.map((issue) => {
+          const r = response.data.issues.map((issue) => {
             return issue.key;
           });
+          return r.sort();
         })
         .catch((error) => {
           console.error(error);
