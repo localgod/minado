@@ -39,4 +39,4 @@ RUN apk --update --no-cache add \
    wget=${wget_version}
 
 RUN npm -g config set user root
-RUN npm install -g npm@8.1.3
+RUN npm install -g npm@8.1.3 typescript@4.5.2
