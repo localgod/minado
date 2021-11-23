@@ -4,6 +4,8 @@ import Jira from '../../jira/Jira.js';
 import config from 'config';
 import CouchDB from '../../couchdb/CouchDb.js';
 
+
+
 /**
  * Demonstrate sync
  */
@@ -22,6 +24,16 @@ export default class Sync {
     this.jira = new Jira(config.get('jira'));
     this.db = new CouchDB();
   }
+
+  async createDatabase() {
+    return this.db.createDatabase('issues').then((response) => {
+      if (response['ok']) {
+        console.log('Database created');
+      } else {
+        console.log('Database mot created');
+      }
+    });
+  }
   /**
     * Sync code
     */
@@ -29,17 +41,8 @@ export default class Sync {
     this.db.createDatabase('issues').then((result) => {
       this.syncJiraToCouch();
       //this.updateAllDatabaseEntries();
-      //this.destroyDB();
     }).catch((error) => {
       console.error(error);
-    })
-  }
-
-  public async destroyDB() {
-    this.db.destroyDatabase('issues').then((result) => {
-      console.log(result['ok']);
-    }).catch((error) => {
-      console.error(error)
     })
   }
 
@@ -47,7 +50,7 @@ export default class Sync {
    * Get all issue from database
    */
   public async updateAllDatabaseEntries(): Promise<void> {
-    let issues = this.nano.use('issues');
+    const issues = this.nano.use('issues');
     const total = await issues.info().then((response) => {
       return response.doc_count;
     });
@@ -61,8 +64,8 @@ export default class Sync {
     for (i; i < total; i++) {
       entries.push(this.jira.getIssue(rows[i].key, ['summary', 'status'])
         .then((content) => {
-          this.db.add(content.key, content.fields);
-          console.log(`Updated: ${content.key}`);
+          this.db.add(content['key'], content['fields']);
+          console.log(`Updated: ${content['key']}`);
           return content;
         }));
     }
@@ -90,7 +93,7 @@ export default class Sync {
     while (i < totalNumberOfissues) {
       requests.push(this.jira.fetch(jql, i, pagesize, fields)
         .then((response) => {
-          return response.data.issues;
+          return response['data']['issues'];
         }));
       i = i + pagesize;
     }
@@ -108,4 +111,4 @@ export default class Sync {
       });
     });
   }
-};
+}

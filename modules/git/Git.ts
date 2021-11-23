@@ -1,6 +1,6 @@
 'use strict';
-import {promisify} from 'util';
-import {exec} from 'child_process';
+import { promisify } from 'util';
+import { exec } from 'child_process';
 
 /**
  * Git wrapper object
@@ -32,4 +32,4 @@ export default class Git {
       }
     });
   }
-};
+}

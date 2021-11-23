@@ -8,7 +8,7 @@ export default class JiraIssue {
    * @param {string} issue - Issue number
    * @return {string}
    */
-  static generate(issue) {
+  static generate(issue: string): string {
     const macroId = 'b694f5bd-e49c-4253-8c92-e82eff75cd71';
     return `
     <ac:structured-macro 
@@ -19,4 +19,4 @@ export default class JiraIssue {
    </ac:structured-macro>
     `.trim();
   }
-};
+}

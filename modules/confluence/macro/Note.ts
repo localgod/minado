@@ -23,4 +23,4 @@ export default class Note {
     </ac:structured-macro>
     `.trim();
   }
-};
+}

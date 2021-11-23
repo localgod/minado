@@ -1,23 +1,25 @@
-'use strict';
-import axios from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import Logger from '../Logger.js';
 /**
  * Confluence access object
  */
 export default class Confluence {
+  private log: Logger;
+  private config: any;
+  private axios: AxiosInstance;
   /**
    * Contruct Confluence access object
    * @constructor
    * @param {object} config - Config options
    */
-  constructor(config) {
+  constructor(config: object) {
     this.log = new Logger();
     this.config = config;
     this.axios = axios.create({
       headers: {
         'Content-Type': 'application/json',
       },
-      baseURL: `${config.host}`,
+      baseURL: `${config['host']}`,
       proxy: false,
       auth: {
         username: process.env.AD_USERNAME,
@@ -33,7 +35,7 @@ export default class Confluence {
    * @param {string} title - Page title
    * @param {string} content - Page content
    */
-  async createPage(space, ancestor, title, content) {
+  async createPage(space: string, ancestor: number, title: string, content: string): Promise<AxiosResponse<any, any>> {
     const data = this.marshal(space, title, ancestor, content);
     return this.axios.post(`/rest/api/content`, data);
   }
@@ -47,7 +49,7 @@ export default class Confluence {
    * @param {number} version - Page version
    * @param {string} content - Page content
    */
-  async updatePage(space, ancestor, title, id, version, content) {
+  async updatePage(space: string, ancestor: number, title: string, id: number, version: number, content: string): Promise<AxiosResponse<any, any>> {
     const data = this.marshal(space, title, ancestor, content, version);
     return this.axios.put(`/rest/api/content/${id}`, data);
   }
@@ -57,9 +59,9 @@ export default class Confluence {
    * @param {string} space - Space key
    * @param {string} title - Page title
    */
-  async getPage(space, title) {
+  async getPage(space: string, title: string): Promise<AxiosResponse<any, any>> {
     return this.axios.get(
-        `/rest/api/content?spaceKey=${space}&title=${title}&expand=version`,
+      `/rest/api/content?spaceKey=${space}&title=${title}&expand=version`,
     );
   }
 
@@ -70,7 +72,7 @@ export default class Confluence {
    * @param {string} title - Page title
    * @param {string} content - Page content
    */
-  async store(space, ancestor, title, content) {
+  async store(space: string, ancestor: number, title: string, content: string): Promise<void> {
     return this.getPage(space, title).then((response) => {
       if (response.data.results.length == 0) {
         this.createPage(space, ancestor, title, content).then((response) => {
@@ -85,15 +87,15 @@ export default class Confluence {
         const id = response.data.results[0].id;
         const version = response.data.results[0].version.number;
         this.updatePage(space, ancestor, title, id, version, `${content}`)
-            .then((response) => {
-              const base = `${response.data['_links'].base}`;
-              const webui = `${response.data['_links'].webui}`;
-              this.log.info(`Updated page: ${base}/${webui}`);
-            })
-            .catch((error) => {
-              console.error(error.response.data.message);
-              this.log.error('Something bad happend with page update');
-            });
+          .then((response) => {
+            const base = `${response.data['_links'].base}`;
+            const webui = `${response.data['_links'].webui}`;
+            this.log.info(`Updated page: ${base}/${webui}`);
+          })
+          .catch((error) => {
+            console.error(error.response.data.message);
+            this.log.error('Something bad happend with page update');
+          });
       }
     }).catch((error) => {
       console.error(error);
@@ -109,7 +111,7 @@ export default class Confluence {
    * @param {number} version - Page version
    * @return {object}
    */
-  marshal(space, title, ancestor, content, version) {
+  marshal(space: string, title: string, ancestor: number, content: string, version?: number): object {
     const data = {};
     data['type'] = 'page';
     data['title'] = title;
@@ -132,4 +134,4 @@ export default class Confluence {
     }
     return data;
   }
-};
+}

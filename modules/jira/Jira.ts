@@ -1,6 +1,6 @@
 'use strict';
-import axios from 'axios';
-import Logger from './../Logger.js';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import Logger from '../Logger.js';
 
 const MAX_REQUESTS_COUNT = 25;
 const INTERVAL_MS = 10;
@@ -13,19 +13,24 @@ let PENDING_REQUESTS = 0;
  * Jira access object
  */
 export default class Jira {
+
+  private log: Logger;
+  private axios: AxiosInstance;
+  private config: object;
+
   /**
    * Contruct Jira access object
    * @constructor
    * @param {object} config - Config options
    */
-  constructor(config) {
+  constructor(config: object) {
     if (typeof config != 'object') {
       throw new Error('No config object provide for jira');
     }
     this.log = new Logger();
     this.config = config;
     this.axios = axios.create({
-      baseURL: `${config.host}`,
+      baseURL: `${config['host']}`,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -37,7 +42,7 @@ export default class Jira {
     });
 
     this.axios.interceptors.request.use((config) => {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const interval = setInterval(() => {
           if (PENDING_REQUESTS < MAX_REQUESTS_COUNT) {
             PENDING_REQUESTS++;
@@ -51,7 +56,7 @@ export default class Jira {
     this.axios.interceptors.response.use((response) => {
       PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1);
       return Promise.resolve(response);
-    }, function(error) {
+    }, function (error) {
       PENDING_REQUESTS = Math.max(0, PENDING_REQUESTS - 1);
       return Promise.reject(error);
     });
@@ -64,14 +69,14 @@ export default class Jira {
    * @param {number} limit - Result limit
    * @param {array} fields - Fields to return
    */
-  async fetch(jql, offset, limit, fields) {
+  async fetch(jql: string, offset: number, limit: number, fields: Array<string>): Promise<AxiosResponse<any, any>> {
     const data = {
       'jql': jql,
       'startAt': offset,
       'maxResults': limit,
       'fields': fields,
     };
-    return this.axios.post(`rest/api/2/search`, data);
+    return await this.axios.post(`rest/api/2/search`, data);
   }
 
   /**
@@ -79,10 +84,10 @@ export default class Jira {
    * @param {string} key
    * @param {array}  fields
    */
-  async getIssue(key, fields) {
+  async getIssue(key: string, fields: Array<any>) {
     return this.fetch(`issuekey  = ${key}`, 0, 1, fields).then((response) => {
-      const fields = response.data.issues[0].fields;
-      fields.status = fields.status.name;
+      const fields: object = response['data']['issues'][0].fields;
+      fields['status'] = fields['status']['name'];
       return new Promise((resolve, reject) => {
         resolve({
           key: key,
@@ -96,10 +101,10 @@ export default class Jira {
   /**
    * Count number of issus return by jql query
    * @param {string} jql Jql query
-   * @return {number}
+   * @return {Promise}
    */
-  async countIssues(jql) {
-    const data = {
+  async countIssues(jql: string): Promise<number> {
+    const data: object = {
       'jql': jql,
       'startAt': 0,
       'maxResults': 1,
@@ -113,16 +118,16 @@ export default class Jira {
   /**
    * Get Jira fields
    */
-  async getFields() {
-    return this.axios.get(`rest/api/2/field`);
+  async getFields(): Promise<AxiosResponse<any, any>> {
+    return await this.axios.get(`rest/api/2/field`);
   }
 
   /**
    * Fetch epic issues
    */
   async fetchEpic() {
-    const epicLinkfieldId = this.config.fieldMapping.epicLink;
-    const jql = `project = ${this.config.project.key} 
+    const epicLinkfieldId: string = this.config['fieldMapping']['epicLink'];
+    const jql  = `project = ${this.config['project']['key']} 
                  and issuetype = epic 
                  and status != closed 
                  order by status ASC`;
@@ -131,32 +136,27 @@ export default class Jira {
       'status',
       epicLinkfieldId,
     ])
-        .then((response) => {
-          const r = response.data.issues.map((issue) => {
-            return issue.key;
-          });
-          return r.sort();
-        })
-        .catch((error) => {
-          console.error(error);
+      .then((response) => {
+        const r = response['data']['issues'].map((issue: object) => {
+          return issue['key'];
         });
+        return r.sort();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   /**
    * Fetch issues linked to specific epic
    * @param {string} epic - epic issue
    */
-  async fetchEpicChildren(epic) {
-    const epicLinkfieldId = this.config.fieldMapping.epicLink;
-    const jql = `project = ${this.config.project.key}
+  async fetchEpicChildren(epic: string) {
+    const epicLinkfieldId: string = this.config['fieldMapping']['epicLink'];
+    const jql = `project = ${this.config['project']['key']}
                  and "epic link" = ${epic}`;
-    return this.fetch(jql, 0, 1000, [
-      'summary',
-      'status',
-      epicLinkfieldId,
-    ])
-        .catch((error) => {
-          console.error(error);
-        });
+    return await this.fetch(jql, 0, 1000, ['summary', 'status', epicLinkfieldId]).catch((error) => {
+      console.error(error);
+    });
   }
-};
+}

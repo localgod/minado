@@ -55,4 +55,4 @@ export default class Template {
       space, this.parent, this.title, this.template(templateArgs),
     );
   }
-};
+}

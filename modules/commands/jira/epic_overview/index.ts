@@ -1,22 +1,25 @@
-'use strict';
 import config from 'config';
-import Jira from '../../jira/Jira.js';
-import Logger from '../../Logger.js';
-import JiraIssueMacro from '../../confluence/macro/JiraIssue.js';
-import NoteMacro from '../../confluence/macro/Note.js';
-import Template from '../../Template.js';
+import Jira from '../../../jira/Jira.js';
+import Logger from '../../../Logger.js';
+import JiraIssueMacro from '../../../confluence/macro/JiraIssue.js';
+import NoteMacro from '../../../confluence/macro/Note.js';
+import Template from '../../../Template.js';
 /**
  * Generate a epic overview and publish it to Confluence
  */
 export default class EpicOverview {
+
+  private cwd: string;
+  private log: Logger;
   /**
    * Contruct Epic overview task
    * @constructor
    */
   constructor() {
-    this.cwd = `./modules/tasks/epic_overview`;
+    this.cwd = `./modules/commands/jira/epic_overview`;
     this.log = new Logger();
   }
+
   /**
    * Create epic overview
    */
@@ -24,19 +27,20 @@ export default class EpicOverview {
     const jira = new Jira(config.get('jira'));
     jira.fetchEpic().then((epics) => {
       const p = [];
-      let issue;
-      epics.forEach((issue) => {
+      let issue: string;
+      epics.forEach((issue: string) => {
         p.push(jira.fetchEpicChildren(issue));
       });
 
       Promise.all(p).then((values) => {
-        const epicLinkfieldId = config.get('jira').fieldMapping.epicLink;
+        const epicLinkfieldId = config.get('jira')['fieldMapping']['epicLink'];
 
         const awesome = {};
         for (issue of values) {
-          if (issue.data.issues.length > 0) {
+
+          if (issue['data']['issues'].length > 0) {
             let t;
-            for (t of issue.data.issues) {
+            for (t of issue['data']['issues']) {
               if (awesome[t.fields[epicLinkfieldId]] == undefined) {
                 awesome[t.fields[epicLinkfieldId]] = [t.key];
               } else {
@@ -60,18 +64,24 @@ export default class EpicOverview {
             });
           }
         }
-        const template = new Template();
-        const parentId = config.get('confluence').space.rootPageId;
-        template.setPageTitle('Epic overview');
-        template.setParentId(parentId);
-        template.setTemplatePath(`${this.cwd}/template.hbs`);
-        return template.write(
-            {notice: NoteMacro.generate('Generated', msg), epics: epics},
-        );
+        return this.saveToConfluence({ notice: NoteMacro.generate('Generated', msg), epics: epics });
       });
     }).catch((error) => {
       console.error(error);
       this.log.error('Something bad happend Jira fethcing');
     });
   }
-};
+
+    /**
+   * 
+   * @param data 
+   * @returns Promise
+   */
+     async saveToConfluence(data:object): Promise<void> {
+      const template = new Template();
+      template.setPageTitle('Epic overview');
+      template.setParentId(config.get('confluence')['space']['rootPageId']);
+      template.setTemplatePath(`${this.cwd}/template.hbs`);
+      return template.write(data);
+    }
+}

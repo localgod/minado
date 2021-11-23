@@ -85,7 +85,7 @@ export default class CouchDB {
       'fields': ['_id', 'status', 'summary'],
       'limit': 5000,
     };
-    let issues = this.nano.use('issues');
+    const issues = this.nano.use('issues');
     const response = await issues.find(query);
     const docs = [];
     response.docs.forEach((issue) => {
@@ -117,7 +117,7 @@ export default class CouchDB {
     * @return {Promise}
     */
   async add(key: string, content: Nano.MaybeDocument | Nano.ViewDocument<unknown>): Promise<object> {
-    let issues = this.nano.use('issues');
+    const issues = this.nano.use('issues');
     return issues.get(key).then((response) => {
       content['_rev'] = response._rev;
       return issues.insert(content, key);
@@ -144,7 +144,7 @@ export default class CouchDB {
   }
 
     /**
-    * Destroy a database for storing issues
+    * Destroy a database
     * @param {string} dbname
     * @return {Promise}
     */
@@ -159,4 +159,4 @@ export default class CouchDB {
         }
       });
     }
-};
+}

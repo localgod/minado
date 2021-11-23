@@ -1,33 +1,27 @@
 {
   "confluence": {
-    "host": "https://confluence/wiki/",
+    "host": "https://confluence",
     "space": {
-      "key": "KEY",
-      "rootPageId": 123456789
+      "key": "key",
+      "rootPageId": 171233135
     }
   },
   "jira": {
-    "host": "https://jira/jira/",
+    "host": "https://jira",
     "project": {
-      "key": "KEY"
+      "key": "key"
     },
     "fieldMapping": {
       "epicLink" : "customfield_10008"
     }
   },
-  "bitbucket": {
-    "host": "https://bitbucket/",
-    "project": {
-      "key": "KEY"
-    }
-  },
   "github": {
     "host": "https://api.github.com:443",
     "org": {
-      "key": "org"
+      "key": "key"
     },
     "team": {
-      "key": "team"
+      "key": "key"
     }
   }
 }
