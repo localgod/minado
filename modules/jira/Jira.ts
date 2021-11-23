@@ -2,9 +2,9 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import Logger from '../Logger.js';
 
-const MAX_REQUESTS_COUNT = 25;
-const INTERVAL_MS = 10;
-let PENDING_REQUESTS = 0;
+const MAX_REQUESTS_COUNT: number = 25;
+const INTERVAL_MS: number = 10;
+let PENDING_REQUESTS: number = 0;
 
 // Regex search example:
 // issueFunction in issueFieldMatch("project = CCOE", "summary", "\\[.*\\].*")
@@ -43,7 +43,7 @@ export default class Jira {
 
     this.axios.interceptors.request.use((config) => {
       return new Promise((resolve) => {
-        const interval = setInterval(() => {
+        const interval: NodeJS.Timer = setInterval(() => {
           if (PENDING_REQUESTS < MAX_REQUESTS_COUNT) {
             PENDING_REQUESTS++;
             clearInterval(interval);
@@ -70,7 +70,7 @@ export default class Jira {
    * @param {array} fields - Fields to return
    */
   async fetch(jql: string, offset: number, limit: number, fields: Array<string>): Promise<AxiosResponse<any, any>> {
-    const data = {
+    const data: object = {
       'jql': jql,
       'startAt': offset,
       'maxResults': limit,
@@ -83,8 +83,9 @@ export default class Jira {
    * Get issue from Jira
    * @param {string} key
    * @param {array}  fields
+   * @returns {Promise}
    */
-  async getIssue(key: string, fields: Array<any>) {
+  async getIssue(key: string, fields: Array<any>): Promise<any> {
     return this.fetch(`issuekey  = ${key}`, 0, 1, fields).then((response) => {
       const fields: object = response['data']['issues'][0].fields;
       fields['status'] = fields['status']['name'];
@@ -125,9 +126,9 @@ export default class Jira {
   /**
    * Fetch epic issues
    */
-  async fetchEpic() {
+  async fetchEpic(): Promise<any> {
     const epicLinkfieldId: string = this.config['fieldMapping']['epicLink'];
-    const jql  = `project = ${this.config['project']['key']} 
+    const jql: string = `project = ${this.config['project']['key']} 
                  and issuetype = epic 
                  and status != closed 
                  order by status ASC`;
@@ -137,7 +138,7 @@ export default class Jira {
       epicLinkfieldId,
     ])
       .then((response) => {
-        const r = response['data']['issues'].map((issue: object) => {
+        const r:string[] = response['data']['issues'].map((issue: object) => {
           return issue['key'];
         });
         return r.sort();
@@ -151,9 +152,9 @@ export default class Jira {
    * Fetch issues linked to specific epic
    * @param {string} epic - epic issue
    */
-  async fetchEpicChildren(epic: string) {
+  async fetchEpicChildren(epic: string): Promise<any> {
     const epicLinkfieldId: string = this.config['fieldMapping']['epicLink'];
-    const jql = `project = ${this.config['project']['key']}
+    const jql:string = `project = ${this.config['project']['key']}
                  and "epic link" = ${epic}`;
     return await this.fetch(jql, 0, 1000, ['summary', 'status', epicLinkfieldId]).catch((error) => {
       console.error(error);

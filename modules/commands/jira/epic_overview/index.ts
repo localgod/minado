@@ -72,16 +72,12 @@ export default class EpicOverview {
     });
   }
 
-    /**
-   * 
-   * @param data 
-   * @returns Promise
-   */
-     async saveToConfluence(data:object): Promise<void> {
-      const template = new Template();
-      template.setPageTitle('Epic overview');
-      template.setParentId(config.get('confluence')['space']['rootPageId']);
-      template.setTemplatePath(`${this.cwd}/template.hbs`);
-      return template.write(data);
-    }
+  async saveToConfluence(data: object): Promise<void> {
+    const template = new Template();
+    template.setPageTitle('Epic overview');
+    template.setParentId(config.get('confluence')['space']['rootPageId']);
+    template.setTemplatePath(`${this.cwd}/template.hbs`);
+    template.setSpaceKey(config.get('confluence')['space']['key']);
+    return template.write(data);
+  }
 }

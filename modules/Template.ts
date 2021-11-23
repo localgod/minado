@@ -1,4 +1,4 @@
-import config, { IConfig } from 'config';
+import config from 'config';
 import Handlebars from 'handlebars';
 import Confluence from './confluence/Confluence.js';
 import fs from 'fs';
@@ -6,53 +6,36 @@ import fs from 'fs';
  * Object for templating output to Confluence with handlebars.
  */
 export default class Template {
-  private config: IConfig;
+  private confluence: Confluence;
   private template: Handlebars.TemplateDelegate;
   private space: string;
   private parent: number;
   private title: string;
 
-  /**
-     * Contruct template
-     * @constructor
-     */
   constructor() {
-    this.config = config;
+    this.confluence = new Confluence(config.get('confluence'));
   }
 
-  /**
-     * Set path to handlebar template
-     * @param {string} path
-     */
-  setTemplatePath(path: string) {
+  setTemplatePath(path: string): void {
     this.template = Handlebars.compile(fs.readFileSync(`${path}`, 'utf8'));
   }
 
-  /**
-     * Set Confluence parent page id
-     * @param {number} id
-     */
-  setParentId(id: number) {
+  setParentId(id: number): void {
     this.parent = id;
   }
 
-  /**
-     * Set Confluence page title
-     * @param {string} title
-     */
-  setPageTitle(title: string) {
+  setPageTitle(title: string): void {
     this.title = title;
   }
 
-  /**
-     * Write template to Confluence
-     * @param {object} templateArgs
-     */
-  async write(templateArgs: object) {
-    const confluence = new Confluence(config.get('confluence'));
-    const space = config.get('confluence')['space']['key'];
-    return confluence.store(
-      space, this.parent, this.title, this.template(templateArgs),
+
+  setSpaceKey(key: string): void {
+    this.space = key;
+  }
+
+  async write(templateArgs: object): Promise<void> {
+    return this.confluence.store(
+      this.space, this.parent, this.title, this.template(templateArgs),
     );
   }
 }

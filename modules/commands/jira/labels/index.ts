@@ -13,10 +13,7 @@ export default class LabelOverview {
   constructor() {
     this.cwd = `./modules/commands/jira/labels`;
   }
-  /**
-   * Create epic overview
-   */
-  async execute() {
+  async execute(): Promise<void> {
     const couch = new CouchDB();
     return couch.getLabels().then((response) => {
       const labels = {};
@@ -32,17 +29,17 @@ export default class LabelOverview {
 
       const b = [];
       for (const [key, value] of Object.entries(labels)) {
-        b.push({label: key, count: value});
+        b.push({ label: key, count: value });
       }
 
       b.sort((a, b) => (a.count < b.count) ? 1 : -1);
 
       const template = new Template();
-      const parentId = config.get('confluence')['space']['rootPageId'];
       template.setPageTitle('Labels overview');
-      template.setParentId(parentId);
+      template.setParentId(config.get('confluence')['space']['rootPageId']);
       template.setTemplatePath(`${this.cwd}/template.hbs`);
-      return template.write({labels: b});
+      template.setSpaceKey(config.get('confluence')['space']['key']);
+      return template.write({ labels: b });
     });
   }
 }
