@@ -25,8 +25,11 @@ function jira() {
       p.execute();
     })
     
-    h.command('fields').description('List all jira fields').action(() => {
+    h.command('fields').description('List all jira fields').action(async () => {
       const jira = new Jira(config.get('jira'));
+      const t:string = await jira.getFieldIdByName('Epic Link');
+      console.log(t)
+      /*
       jira.getFields().then((response) => {
         response.data.forEach((field: object) => {
           console.log(field);
@@ -34,6 +37,7 @@ function jira() {
       }).catch((error) => {
         console.error(error);
       });
+      */
     })
     return h;
 }

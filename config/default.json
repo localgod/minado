@@ -13,10 +13,7 @@
     },
     "projects": [
       "key","key"
-    ],
-    "fieldMapping": {
-      "epicLink" : "customfield_10008"
-    }
+    ]
   },
   "github": {
     "host": "https://api.github.com:443",

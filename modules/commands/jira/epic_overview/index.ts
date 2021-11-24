@@ -32,8 +32,8 @@ export default class EpicOverview {
         p.push(jira.fetchEpicChildren(issue));
       });
 
-      Promise.all(p).then((values) => {
-        const epicLinkfieldId: string = config.get('jira')['fieldMapping']['epicLink'];
+      Promise.all(p).then(async (values) => {
+        const epicLinkfieldId: string = (await jira.getFieldIdByName('Epic Link'));
         const allRelevantIssues: object[] = [];
 
         values.forEach((res: object[]) => { res.forEach((issue: object[]) => { allRelevantIssues.push(issue); }); });

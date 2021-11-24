@@ -1,6 +1,7 @@
 'use strict';
 import Nano from 'nano';
 import config from 'config';
+import Jira from '../jira/Jira.js';
 
 /**
  * Counch DB wrapper
@@ -72,8 +73,10 @@ export default class CouchDB {
   /**
    * Get non-closed epics
    */
-   public async fetchEpicChildren(epic: string):Promise<object[]>{
-    const epicLinkfieldId: string = config.get('jira')['fieldMapping']['epicLink'];
+  public async fetchEpicChildren(epic: string): Promise<object[]> {
+    const jira: Jira = new Jira(config.get('jira'));
+    const epicLinkfieldId: string = (await jira.getFieldIdByName('Epic Link'));
+
     const query: Nano.MangoQuery = {
       'selector': {
         '_id': {
