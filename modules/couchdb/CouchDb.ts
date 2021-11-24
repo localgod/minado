@@ -1,5 +1,6 @@
 'use strict';
 import Nano from 'nano';
+import config from 'config';
 
 /**
  * Counch DB wrapper
@@ -30,19 +31,19 @@ export default class CouchDB {
         },
       },
       'fields': ['_id', 'labels'],
-      'limit': 5000,
+      'limit': 10000,
     };
     const issues = this.nano.use('issues');
     const response = await issues.find(query);
-    return response.docs.map((issue)  => {
-      return {key: issue._id, labels: issue['labels']};
+    return response.docs.map((issue) => {
+      return { key: issue._id, labels: issue['labels'] };
     });
   }
 
   /**
    * Get non-closed epics
    */
-  public async getEpics(): Promise<string[]> {
+  public async fetchEpics(): Promise<string[]> {
     const query: Nano.MangoQuery = {
       'selector': {
         '_id': {
@@ -57,7 +58,7 @@ export default class CouchDB {
       },
       'fields': ['_id', 'status', 'summary', 'issuetype'],
       'sort': [
-        {'_id': 'asc'}
+        { '_id': 'asc' }
       ],
       'limit': 5000,
     };
@@ -67,6 +68,36 @@ export default class CouchDB {
       return issue._id;
     });
   }
+
+  /**
+   * Get non-closed epics
+   */
+   public async fetchEpicChildren(epic: string):Promise<object[]>{
+    const epicLinkfieldId: string = config.get('jira')['fieldMapping']['epicLink'];
+    const query: Nano.MangoQuery = {
+      'selector': {
+        '_id': {
+          '$gt': null,
+        },
+        [epicLinkfieldId]: {
+          '$eq': epic,
+        },
+      },
+      'fields': ['_id', 'status', 'summary', 'issuetype'],
+      'sort': [
+        { '_id': 'asc' }
+      ],
+      'limit': 5000,
+    };
+    const issues = this.nano.use('issues');
+    const response = await issues.find(query);
+    return response.docs;
+  }
+
+
+
+
+
 
   /**
    * Find prefixed issues
@@ -83,7 +114,7 @@ export default class CouchDB {
         },
       },
       'fields': ['_id', 'status', 'summary'],
-      'limit': 5000,
+      'limit': 10000,
     };
     const issues = this.nano.use('issues');
     const response = await issues.find(query);
@@ -103,7 +134,7 @@ export default class CouchDB {
     });
     const b = [];
     for (const [key, value] of Object.entries(result)) {
-      b.push({prefix: key, count: value});
+      b.push({ prefix: key, count: value });
     }
 
     b.sort((a, b) => (a.count < b.count) ? 1 : -1);
@@ -136,27 +167,27 @@ export default class CouchDB {
       return response;
     }).catch((error) => {
       if (error.error == 'file_exists') {
-        return {ok: true};
+        return { ok: true };
       } else {
         throw new Error(error.reason);
       }
     });
   }
 
-    /**
-    * Destroy a database
-    * @param {string} dbname
-    * @return {Promise}
-    */
-     async destroyDatabase(dbname: string): Promise<object> {
-      return this.nano.db.destroy(dbname).then((response) => {
-        return response;
-      }).catch((error) => {
-        if (error.error == 'file_exists') {
-          return {ok: true};
-        } else {
-          throw new Error(error.reason);
-        }
-      });
-    }
+  /**
+  * Destroy a database
+  * @param {string} dbname
+  * @return {Promise}
+  */
+  async destroyDatabase(dbname: string): Promise<object> {
+    return this.nano.db.destroy(dbname).then((response) => {
+      return response;
+    }).catch((error) => {
+      if (error.error == 'file_exists') {
+        return { ok: true };
+      } else {
+        throw new Error(error.reason);
+      }
+    });
+  }
 }

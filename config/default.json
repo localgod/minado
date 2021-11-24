@@ -11,6 +11,9 @@
     "project": {
       "key": "key"
     },
+    "projects": [
+      "key","key"
+    ],
     "fieldMapping": {
       "epicLink" : "customfield_10008"
     }

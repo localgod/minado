@@ -1,5 +1,5 @@
 'use strict';
-import Nano from 'nano'
+import Nano from 'nano';
 import Jira from '../../jira/Jira.js';
 import config from 'config';
 import CouchDB from '../../couchdb/CouchDb.js';
@@ -25,7 +25,7 @@ export default class Sync {
     this.db = new CouchDB();
   }
 
-  async createDatabase() {
+  async createDatabase(): Promise<void> {
     return this.db.createDatabase('issues').then((response) => {
       if (response['ok']) {
         console.log('Database created');
@@ -37,54 +37,25 @@ export default class Sync {
   /**
     * Sync code
     */
-  async execute() {
+  async execute(): Promise<void> {
     this.db.createDatabase('issues').then((result) => {
       this.syncJiraToCouch();
-      //this.updateAllDatabaseEntries();
     }).catch((error) => {
       console.error(error);
-    })
-  }
-
-  /**
-   * Get all issue from database
-   */
-  public async updateAllDatabaseEntries(): Promise<void> {
-    const issues = this.nano.use('issues');
-    const total = await issues.info().then((response) => {
-      return response.doc_count;
-    });
-
-    let i = 0;
-
-    const rows = await issues.list().then((body) => {
-      return body.rows;
-    });
-    const entries = [];
-    for (i; i < total; i++) {
-      entries.push(this.jira.getIssue(rows[i].key, ['summary', 'status'])
-        .then((content) => {
-          this.db.add(content['key'], content['fields']);
-          console.log(`Updated: ${content['key']}`);
-          return content;
-        }));
-    }
-    Promise.all(entries).then((values) => {
-      console.log(`done`);
     });
   }
 
   /**
    * Fetch all issues
    */
-  async syncJiraToCouch() {
+  async syncJiraToCouch(): Promise<void> {
     const epicLinkfieldId = config.get('jira')['fieldMapping']['epicLink'];
-    const projectKey = config.get('jira')['project']['key'];
+    const projectKeys: string[] = <string[]>config.get('jira')['projects'];
     const fields = [
       'summary', 'issuetype', 'status', epicLinkfieldId, 'labels',
     ];
     console.time('Jira fetching');
-    const jql = `project = ${projectKey} order by issuekey ASC`;
+    const jql = `project in(${projectKeys.join()}) order by issuekey ASC`;
     const totalNumberOfissues = await this.jira.countIssues(jql);
     const pagesize = 100;
     let i = 0;

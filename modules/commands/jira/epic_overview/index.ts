@@ -25,7 +25,7 @@ export default class EpicOverview {
    */
   async execute() {
     const jira = new Jira(config.get('jira'));
-    jira.fetchEpic().then((epics) => {
+    jira.fetchEpics().then((epics) => {
       const p = [];
       let issue: string;
       epics.forEach((issue: string) => {
@@ -33,29 +33,29 @@ export default class EpicOverview {
       });
 
       Promise.all(p).then((values) => {
-        const epicLinkfieldId = config.get('jira')['fieldMapping']['epicLink'];
+        const epicLinkfieldId: string = config.get('jira')['fieldMapping']['epicLink'];
+        const allRelevantIssues: object[] = [];
 
-        const awesome = {};
-        for (issue of values) {
+        values.forEach((res: object[]) => { res.forEach((issue: object[]) => { allRelevantIssues.push(issue); }); });
 
-          if (issue['data']['issues'].length > 0) {
-            let t;
-            for (t of issue['data']['issues']) {
-              if (awesome[t.fields[epicLinkfieldId]] == undefined) {
-                awesome[t.fields[epicLinkfieldId]] = [t.key];
-              } else {
-                awesome[t.fields[epicLinkfieldId]].push(t.key);
-              }
-            }
+        const result = {};
+        allRelevantIssues.forEach((issue) => {
+          const t: any = <{key:string ,fields: string[]}>issue
+          const epic: string = t.fields[epicLinkfieldId];
+          const key: string = t.key;
+          if (result[epic] == undefined) {
+            result[epic] = [key];
+          } else {
+            result[epic].push(key);
           }
-        }
+        });
 
-        const msg = 'This page was generated. Any manual edits will be lost.';
+        const msg: string = 'This page as generated. Any manual edits will be lost.';
         const epics = [];
-        for (const key in awesome) {
-          if (awesome.hasOwnProperty(key)) {
-            const stories = [];
-            for (const j of awesome[key]) {
+        for (const key in result) {
+          if (result.hasOwnProperty(key)) {
+            const stories: string[] = [];
+            for (const j of result[key]) {
               stories.push(JiraIssueMacro.generate(j));
             }
             epics.push({
@@ -66,9 +66,10 @@ export default class EpicOverview {
         }
         return this.saveToConfluence({ notice: NoteMacro.generate('Generated', msg), epics: epics });
       });
+
     }).catch((error) => {
       console.error(error);
-      this.log.error('Something bad happend Jira fethcing');
+      this.log.error('Something bad happend while Jira fethcing');
     });
   }
 

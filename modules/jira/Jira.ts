@@ -126,9 +126,10 @@ export default class Jira {
   /**
    * Fetch epic issues
    */
-  async fetchEpic(): Promise<any> {
+  async fetchEpics(): Promise<any> {
     const epicLinkfieldId: string = this.config['fieldMapping']['epicLink'];
-    const jql: string = `project = ${this.config['project']['key']} 
+    const projectKeys: string[] = <string[]>this.config['projects'];
+    const jql: string = `project in(${projectKeys.join()})
                  and issuetype = epic 
                  and status != closed 
                  order by status ASC`;
@@ -138,7 +139,7 @@ export default class Jira {
       epicLinkfieldId,
     ])
       .then((response) => {
-        const r:string[] = response['data']['issues'].map((issue: object) => {
+        const r: string[] = response['data']['issues'].map((issue: object) => {
           return issue['key'];
         });
         return r.sort();
@@ -152,11 +153,16 @@ export default class Jira {
    * Fetch issues linked to specific epic
    * @param {string} epic - epic issue
    */
-  async fetchEpicChildren(epic: string): Promise<any> {
+  async fetchEpicChildren(epic: string): Promise<object[]> {
     const epicLinkfieldId: string = this.config['fieldMapping']['epicLink'];
-    const jql:string = `project = ${this.config['project']['key']}
+    const projectKeys: string[] = <string[]>this.config['projects'];
+    const jql: string = `project in(${projectKeys.join()}) 
                  and "epic link" = ${epic}`;
-    return await this.fetch(jql, 0, 1000, ['summary', 'status', epicLinkfieldId]).catch((error) => {
+    return await this.fetch(jql, 0, 1000, ['summary', 'status', epicLinkfieldId]).then((response) => {
+      return response.data.issues.map(entity => {
+        return {'key':entity.key, 'fields': entity.fields}
+      });
+    }).catch((error) => {
       console.error(error);
     });
   }
