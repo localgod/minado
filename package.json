@@ -17,7 +17,7 @@
   "author": "Johanns Skov Frandsen",
   "dependencies": {
     "axios": "^0.24.0",
-    "chalk": "^4.1.2",
+    "chalk": "^5.0.0",
     "cli-progress": "^3.9.1",
     "commander": "^8.3.0",
     "config": "^3.3.6",
