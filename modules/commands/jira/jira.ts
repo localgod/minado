@@ -2,6 +2,7 @@ import { Command } from "commander";
 import config from "config";
 import Jira from "../../jira/Jira.js";
 import EpicOverview from "./epic_overview/index.js";
+import Status from "./status/index.js";
 import Prefixed from './prefixed_issues/index.js';
 import Labels from './labels/index.js';
 
@@ -28,16 +29,12 @@ function jira() {
     h.command('fields').description('List all jira fields').action(async () => {
       const jira = new Jira(config.get('jira'));
       const t:string = await jira.getFieldIdByName('Epic Link');
-      console.log(t)
-      /*
-      jira.getFields().then((response) => {
-        response.data.forEach((field: object) => {
-          console.log(field);
-        });
-      }).catch((error) => {
-        console.error(error);
-      });
-      */
+    })
+
+    h.command('status').description('List all jira status').action(async () => {
+      const s = new Status();
+      console.log(await s.status());
+      
     })
     return h;
 }

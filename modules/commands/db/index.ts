@@ -49,7 +49,7 @@ export default class Sync {
    * Fetch all issues
    */
   async syncJiraToCouch(): Promise<void> {
-    const epicLinkfieldId = config.get('jira')['fieldMapping']['epicLink'];
+    const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));
     const projectKeys: string[] = <string[]>config.get('jira')['projects'];
     const fields = [
       'summary', 'issuetype', 'status', epicLinkfieldId, 'labels',

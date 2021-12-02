@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Collection of tools use for automating scrum processes.",
   "license": "MIT",
-  "main": "bin/index.js",
+  "main": "bin/minado.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
