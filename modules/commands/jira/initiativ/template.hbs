@@ -1,0 +1,25 @@
+{{{ notice }}}
+<table>
+  <colgroup>
+    <col />
+    <col />
+  </colgroup>
+  <tbody>
+    <tr>
+      <th>Epic</th>
+      <th>Stories</th>
+    </tr>
+    {{#each epics}}
+    <tr>
+      <td>
+        {{{ this.epic }}}
+      </td>
+      <td>
+        {{#each this.stories}}
+        {{{ this }}}<br/>
+        {{/each}}
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

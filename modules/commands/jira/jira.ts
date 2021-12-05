@@ -5,6 +5,7 @@ import EpicOverview from "./epic_overview/index.js";
 import Status from "./status/index.js";
 import Prefixed from './prefixed_issues/index.js';
 import Labels from './labels/index.js';
+import Initiativ from './initiativ/index.js';
 
 function jira() {
     const h = new Command('jira')
@@ -34,6 +35,11 @@ function jira() {
     h.command('status').description('List all jira status').action(async () => {
       const s = new Status();
       console.log(await s.status());
+      
+    })
+    h.command('initiativ').description('List initiativ').action(async () => {
+      const s = new Initiativ();
+      await s.initiativ(['Supersubscription'])
       
     })
     return h;
