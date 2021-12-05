@@ -1,10 +1,8 @@
 import config from 'config';
 import Jira from '../../../jira/Jira.js';
 import Logger from '../../../Logger.js';
-import JiraIssueMacro from '../../../confluence/macro/JiraIssue.js';
-import NoteMacro from '../../../confluence/macro/Note.js';
 import Template from '../../../Template.js';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { inspect } from 'util'
 interface JiraResponse {
     expand: string,
@@ -72,7 +70,7 @@ export default class Initiativ {
     }
 
     public async initiativ(labels: string[]) {
-        const result: object = {}
+        let result: object = {}
         const epics: JiraIssue[] = (<JiraResponse>(await this.getEpicsWithlabels(labels)).data).issues;
         const requests1: Promise<AxiosResponse<any, any>>[] = epics.map((issue) => { return this.fetchEpicChildren(issue.key); })
         const epicStories: AxiosResponse[] = (await Promise.all(requests1));
@@ -83,7 +81,7 @@ export default class Initiativ {
         const storySubTasks: AxiosResponse[] = (await Promise.all(requests2));
 
 
-        const result2: object = {}
+        const result2: object = []
 
         storySubTasks.map((x) => {
             return (<JiraResponse>x.data).issues.map((z) => {
@@ -111,10 +109,8 @@ export default class Initiativ {
             })
         })
 
-        
-
-        console.log(inspect({ initiatives: labels, tree: result }, false, null))
-        //await this.saveToConfluence({ initiatives: labels, tree: result })
+        //console.log(inspect({ initiatives: labels, tree: result }, false, null))
+        await this.saveToConfluence({ initiatives: labels, tree: result })
     }
 
     async saveToConfluence(data: object): Promise<void> {

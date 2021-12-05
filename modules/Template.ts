@@ -1,6 +1,8 @@
 import config from 'config';
 import Handlebars from 'handlebars';
 import Confluence from './confluence/Confluence.js';
+import JiraIssueMacro from './confluence/macro/JiraIssue.js';
+import NoteMacro from './confluence/macro/Note.js';
 import fs from 'fs';
 /**
  * Object for templating output to Confluence with handlebars.
@@ -17,6 +19,16 @@ export default class Template {
   }
 
   setTemplatePath(path: string): void {
+
+
+
+    Handlebars.registerHelper('jiraIssueMacro', (aString) => {
+      return JiraIssueMacro.generate(aString)
+    })
+
+    Handlebars.registerHelper('noteMacro ', (aString) => {
+      return JiraIssueMacro.generate(aString)
+    })
     this.template = Handlebars.compile(fs.readFileSync(`${path}`, 'utf8'));
   }
 
