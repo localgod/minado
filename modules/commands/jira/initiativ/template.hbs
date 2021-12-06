@@ -1,25 +1,20 @@
-{{{ notice }}}
-<table>
-  <colgroup>
-    <col />
-    <col />
-  </colgroup>
-  <tbody>
-    <tr>
-      <th>Epic</th>
-      <th>Stories</th>
-    </tr>
-    {{#each epics}}
-    <tr>
-      <td>
-        {{{ this.epic }}}
-      </td>
-      <td>
-        {{#each this.stories}}
-        {{{ this }}}<br/>
-        {{/each}}
-      </td>
-    </tr>
+{{{ noteMacro "Generated" "This page as generated. Any manual edits will be lost." }}}
+<h1>{{ initiatives }}</h1>
+<ul>
+{{#each tree}}
+
+  <li>{{{ jiraIssueMacro @key }}}</li>
+  <ul>
+  {{#each this}}
+    {{#each this}}
+    <li>{{{ jiraIssueMacro @key }}}</li>
+    <ul>
+    {{#each this}}
+    <li>{{{ jiraIssueMacro this}}}</li>
     {{/each}}
-  </tbody>
-</table>
+    </ul>
+    {{/each}}
+  {{/each}}
+  </ul>
+{{/each}}
+</ul>

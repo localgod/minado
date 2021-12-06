@@ -1,4 +1,4 @@
-{{{ notice }}}
+{{{ noteMacro "Generated" "This page as generated. Any manual edits will be lost." }}}
 <table>
   <colgroup>
     <col />
@@ -12,11 +12,11 @@
     {{#each epics}}
     <tr>
       <td>
-        {{{ this.epic }}}
+        {{{ jiraIssueMacro this.epic }}}
       </td>
       <td>
         {{#each this.stories}}
-        {{{ this }}}<br/>
+        {{{ jiraIssueMacro this }}}<br/>
         {{/each}}
       </td>
     </tr>

@@ -1,8 +1,6 @@
 import config from 'config';
 import Jira from '../../../jira/Jira.js';
 import Logger from '../../../Logger.js';
-import JiraIssueMacro from '../../../confluence/macro/JiraIssue.js';
-import NoteMacro from '../../../confluence/macro/Note.js';
 import Template from '../../../Template.js';
 /**
  * Generate a epic overview and publish it to Confluence
@@ -50,21 +48,20 @@ export default class EpicOverview {
           }
         });
 
-        const msg: string = 'This page as generated. Any manual edits will be lost.';
         const epics = [];
         for (const key in result) {
           if (result.hasOwnProperty(key)) {
             const stories: string[] = [];
             for (const j of result[key]) {
-              stories.push(JiraIssueMacro.generate(j));
+              stories.push(j);
             }
             epics.push({
-              epic: JiraIssueMacro.generate(key),
+              epic: key,
               stories: stories,
             });
           }
         }
-        return this.saveToConfluence({ notice: NoteMacro.generate('Generated', msg), epics: epics });
+        return this.saveToConfluence({ epics: epics });
       });
 
     }).catch((error) => {
