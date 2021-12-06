@@ -12,10 +12,10 @@
     {{#each epics}}
     <tr>
       <td>
-        {{{ jiraIssueMacro this.epic }}}
+        {{{ jiraIssueMacro @key }}}
       </td>
       <td>
-        {{#each this.stories}}
+        {{#each this}}
         {{{ jiraIssueMacro this }}}<br/>
         {{/each}}
       </td>

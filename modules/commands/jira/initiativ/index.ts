@@ -1,24 +1,9 @@
 import config from 'config';
-import Jira from '../../../jira/Jira.js';
+import Jira, { JiraIssue, JiraResponse } from '../../../jira/Jira.js';
 import Logger from '../../../Logger.js';
 import Template from '../../../Template.js';
 import { AxiosResponse } from 'axios';
 import { inspect } from 'util'
-interface JiraResponse {
-    expand: string,
-    startAt: number,
-    maxResults: number,
-    total: number,
-    issues: JiraIssue[]
-}
-
-interface JiraIssue {
-    expand: string,
-    id: number,
-    self: string,
-    key: string,
-    fields: object
-}
 
 interface InitiativResult {
     initiatives: string[],

@@ -9,6 +9,26 @@ let PENDING_REQUESTS: number = 0;
 // Regex search example:
 // issueFunction in issueFieldMatch("project = CCOE", "summary", "\\[.*\\].*")
 
+
+interface JiraResponse {
+  expand: string,
+  startAt: number,
+  maxResults: number,
+  total: number,
+  issues: JiraIssue[]
+}
+
+interface JiraIssue {
+  expand: string,
+  id: number,
+  self: string,
+  key: string,
+  fields: object
+}
+
+export { JiraResponse, JiraIssue }
+
+
 /**
  * Jira access object
  */
@@ -132,32 +152,6 @@ export default class Jira {
    */
   async getFields(): Promise<AxiosResponse<any, any>> {
     return await this.axios.get(`rest/api/2/field`);
-  }
-
-  /**
-   * Fetch epic issues
-   */
-  async fetchEpics(): Promise<any> {
-    const epicLinkfieldId: string = (await this.getFieldIdByName('Epic Link'));
-    const projectKeys: string[] = <string[]>this.config['projects'];
-    const jql: string = `project in(${projectKeys.join()})
-                 and issuetype = epic 
-                 and status != closed 
-                 order by status ASC`;
-    return this.fetch(jql, 0, 1000, [
-      'summary',
-      'status',
-      epicLinkfieldId,
-    ])
-      .then((response) => {
-        const r: string[] = response['data']['issues'].map((issue: object) => {
-          return issue['key'];
-        });
-        return r.sort();
-      })
-      .catch((error) => {
-        console.error(error);
-      });
   }
 
   /**

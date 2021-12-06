@@ -1,6 +1,6 @@
+import { AxiosResponse } from 'axios';
 import config from 'config';
-import Jira from '../../../jira/Jira.js';
-import Logger from '../../../Logger.js';
+import Jira, { JiraIssue, JiraResponse } from '../../../jira/Jira.js';
 import Template from '../../../Template.js';
 /**
  * Generate a epic overview and publish it to Confluence
@@ -8,69 +8,52 @@ import Template from '../../../Template.js';
 export default class EpicOverview {
 
   private cwd: string;
-  private log: Logger;
-  /**
-   * Contruct Epic overview task
-   * @constructor
-   */
+  private jira: Jira;
+
   constructor() {
     this.cwd = `./modules/commands/jira/epic_overview`;
-    this.log = new Logger();
+    this.jira = new Jira(config.get('jira'));
   }
 
-  /**
-   * Create epic overview
-   */
-  async execute() {
-    const jira = new Jira(config.get('jira'));
-    jira.fetchEpics().then((epics) => {
-      const p = [];
-      let issue: string;
-      epics.forEach((issue: string) => {
-        p.push(jira.fetchEpicChildren(issue));
-      });
-
-      Promise.all(p).then(async (values) => {
-        const epicLinkfieldId: string = (await jira.getFieldIdByName('Epic Link'));
-        const allRelevantIssues: object[] = [];
-
-        values.forEach((res: object[]) => { res.forEach((issue: object[]) => { allRelevantIssues.push(issue); }); });
-
-        const result = {};
-        allRelevantIssues.forEach((issue) => {
-          const t: any = <{key:string ,fields: string[]}>issue
-          const epic: string = t.fields[epicLinkfieldId];
-          const key: string = t.key;
-          if (result[epic] == undefined) {
-            result[epic] = [key];
-          } else {
-            result[epic].push(key);
-          }
-        });
-
-        const epics = [];
-        for (const key in result) {
-          if (result.hasOwnProperty(key)) {
-            const stories: string[] = [];
-            for (const j of result[key]) {
-              stories.push(j);
-            }
-            epics.push({
-              epic: key,
-              stories: stories,
-            });
-          }
-        }
-        return this.saveToConfluence({ epics: epics });
-      });
-
-    }).catch((error) => {
+  private async fetchEpics(): Promise<string[]> {
+    try {
+      const jql: string = `project IN(${(<string[]>config.get('jira')['projects']).join()}) AND issuetype = epic AND status != closed ORDER BY status ASC`;
+      const epics: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
+      return epics.map((issue: object) => issue['key']).sort()
+    } catch (error) {
       console.error(error);
-      this.log.error('Something bad happend while Jira fethcing');
-    });
+    }
   }
 
-  async saveToConfluence(data: object): Promise<void> {
+  private async fetchEpicChildren(epic: string): Promise<object[]> {
+    try {
+      const jql: string = `project in(${(<string[]>config.get('jira')['projects']).join()}) and "epic link" = ${epic} and status not in (closed, Done, Resolved, Cancelled) order by status ASC`;
+      const children: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
+      return children.map((entity: object) => { return { 'key': entity['key'], 'fields': entity['fields'] } });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async execute():Promise<void> {
+    try {
+      const issues = (await Promise.all((<string[]>await this.fetchEpics()).map((issue: string) => this.fetchEpicChildren(issue)))).flat();
+      const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));
+      const result = {}
+      issues.forEach((issue: JiraIssue) => {
+        if (!result.hasOwnProperty(issue.fields[epicLinkfieldId])) {
+          result[issue.fields[epicLinkfieldId]] = [issue.key];
+        } else {
+          result[issue.fields[epicLinkfieldId]].push(issue.key);
+        }
+      })
+      await this.saveToConfluence({ epics: result });
+    } catch(error) {
+      console.error(error)
+    }
+  }
+
+  private async saveToConfluence(data: object): Promise<void> {
     const template = new Template();
     template.setPageTitle('Epic overview');
     template.setParentId(config.get('confluence')['space']['rootPageId']);
