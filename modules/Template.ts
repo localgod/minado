@@ -4,6 +4,15 @@ import Confluence from './confluence/Confluence.js';
 import JiraIssueMacro from './confluence/macro/JiraIssue.js';
 import NoteMacro from './confluence/macro/Note.js';
 import fs from 'fs';
+
+Handlebars.registerHelper('jiraIssueMacro', (aString) => {
+  return JiraIssueMacro.generate(aString)
+})
+
+Handlebars.registerHelper('noteMacro', (title,content) => {
+  return NoteMacro.generate(title,content)
+})
+
 /**
  * Object for templating output to Confluence with handlebars.
  */
@@ -19,16 +28,6 @@ export default class Template {
   }
 
   setTemplatePath(path: string): void {
-
-
-
-    Handlebars.registerHelper('jiraIssueMacro', (aString) => {
-      return JiraIssueMacro.generate(aString)
-    })
-
-    Handlebars.registerHelper('noteMacro ', (aString) => {
-      return JiraIssueMacro.generate(aString)
-    })
     this.template = Handlebars.compile(fs.readFileSync(`${path}`, 'utf8'));
   }
 
@@ -39,7 +38,6 @@ export default class Template {
   setPageTitle(title: string): void {
     this.title = title;
   }
-
 
   setSpaceKey(key: string): void {
     this.space = key;

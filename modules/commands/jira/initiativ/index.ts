@@ -53,10 +53,6 @@ export default class Initiativ {
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status'])
     }
 
-    /**
-     * Fetch issues linked to specific epic
-     * @param {string} epic - epic issue
-     */
     private async fetchEpicChildren(epic: string): Promise<AxiosResponse<any, any>> {
         this.epicLinkfieldId = (await this.jira.getFieldIdByName('Epic Link'));
         const projectKeys: string[] = <string[]>config.get('jira')['projects'];
@@ -69,30 +65,39 @@ export default class Initiativ {
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status', 'parent'])
     }
 
-    public async initiativ(labels: string[]) {
-        let result: object = {}
-        const epics: JiraIssue[] = (<JiraResponse>(await this.getEpicsWithlabels(labels)).data).issues;
-        const requests1: Promise<AxiosResponse<any, any>>[] = epics.map((issue) => { return this.fetchEpicChildren(issue.key); })
-        const epicStories: AxiosResponse[] = (await Promise.all(requests1));
-        const requests2: Promise<AxiosResponse<any, any>>[] = (epicStories.map((request) => { return request.data.issues })).flat().map((t) => {
+    private async featchAllChildren(epicStories: AxiosResponse[]): Promise<AxiosResponse[]> {
+        const requests: Promise<AxiosResponse<any, any>>[] = (epicStories.map((request) => { return request.data.issues })).flat().map((t) => {
             return this.fetchChildren(t.key)
         })
+        return (await Promise.all(requests));
+    }
 
-        const storySubTasks: AxiosResponse[] = (await Promise.all(requests2));
+    private async fetchAllEpicChildren(epics: JiraIssue[]): Promise<AxiosResponse[]> {
+        const requests: Promise<AxiosResponse<any, any>>[] = epics.map((issue) => { return this.fetchEpicChildren(issue.key); })
+        return (await Promise.all(requests));
+    }
 
-
-        const result2: object = []
+    getStorySubTasks(storySubTasks: AxiosResponse[]): object {
+        const result: object = []
 
         storySubTasks.map((x) => {
             return (<JiraResponse>x.data).issues.map((z) => {
                 return { key: z.key, parent: z.fields['parent']['key'] }
             })
         }).flat().map((m) => {
-            if (!result2.hasOwnProperty(m.parent)) {
-                result2[m.parent] = []
+            if (!result.hasOwnProperty(m.parent)) {
+                result[m.parent] = []
             }
-            result2[m.parent].push(m.key)
+            result[m.parent].push(m.key)
         })
+        return result;
+    }
+
+    public async initiativ(labels: string[]) {
+        let result: object = {}
+        const epics: JiraIssue[] = (<JiraResponse>(await this.getEpicsWithlabels(labels)).data).issues;
+        const epicStories: AxiosResponse[] = (await this.fetchAllEpicChildren(epics));
+        const storySubTasks: object = this.getStorySubTasks((await this.featchAllChildren(epicStories)))
 
         epicStories.map((issue) => {
             const stories: JiraIssue[] = (<JiraResponse>(<JiraResponse>issue.data)).issues;
@@ -101,8 +106,8 @@ export default class Initiativ {
                     result[i.fields[this.epicLinkfieldId]] = []
                 }
 
-                if (result2.hasOwnProperty(i.key)) {
-                    result[i.fields[this.epicLinkfieldId]].push({ [i.key]: result2[i.key] })
+                if (storySubTasks.hasOwnProperty(i.key)) {
+                    result[i.fields[this.epicLinkfieldId]].push({ [i.key]: storySubTasks[i.key] })
                 } else {
                     result[i.fields[this.epicLinkfieldId]].push({ [i.key]: [] })
                 }
