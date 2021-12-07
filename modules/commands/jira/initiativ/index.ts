@@ -14,57 +14,42 @@ interface InitiativResult {
  * Generate a epic overview and publish it to Confluence
  */
 export default class Initiativ {
-
     private cwd: string;
     private log: Logger;
-
     private jira: Jira;
-
     private epicLinkfieldId: string
-
-    /**
-     * Contruct Epic overview task
-     * @constructor
-     */
+    private excludeStatus:string[];
     constructor() {
         this.cwd = `./modules/commands/jira/initiativ`;
         this.log = new Logger();
         this.jira = new Jira(config.get('jira'));
+        this.excludeStatus = ['Closed', 'Done', 'Resolved', 'Cancelled']
     }
-
     private async getEpicsWithlabels(labels: string[]): Promise<AxiosResponse<any, any>> {
-        const projectKeys: string[] = <string[]>config.get('jira')['projects'];
-        const jql: string = `project in(${projectKeys.join()}) AND issuetype = Epic AND labels in(${labels.join()})`;
+        const jql: string = `issuetype = Epic AND labels IN(${labels.join()}) ORDER BY status ASC`;
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status'])
     }
-
     private async fetchEpicChildren(epic: string): Promise<AxiosResponse<any, any>> {
         this.epicLinkfieldId = (await this.jira.getFieldIdByName('Epic Link'));
-        const projectKeys: string[] = <string[]>config.get('jira')['projects'];
-        const jql: string = `project in(${projectKeys.join()}) and "epic link" = ${epic}`;
+        const jql: string = `"epic link" = ${epic} AND status NOT IN (${this.excludeStatus.join()}) ORDER BY status ASC`;
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status', this.epicLinkfieldId])
     }
-
     private async fetchChildren(parent: string): Promise<AxiosResponse<any, any>> {
-        const jql: string = `parent = ${parent}`;
+        const jql: string = `parent = ${parent} AND status NOT IN (${this.excludeStatus.join()}) ORDER BY status ASC`;
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status', 'parent'])
     }
-
     private async featchAllChildren(epicStories: AxiosResponse[]): Promise<AxiosResponse[]> {
         const requests: Promise<AxiosResponse<any, any>>[] = (epicStories.map((request) => { return request.data.issues })).flat().map((t) => {
             return this.fetchChildren(t.key)
         })
         return (await Promise.all(requests));
     }
-
     private async fetchAllEpicChildren(epics: JiraIssue[]): Promise<AxiosResponse[]> {
         const requests: Promise<AxiosResponse<any, any>>[] = epics.map((issue) => { return this.fetchEpicChildren(issue.key); })
         return (await Promise.all(requests));
     }
-
     getStorySubTasks(storySubTasks: AxiosResponse[]): object {
         const result: object = []
-
         storySubTasks.map((x) => {
             return (<JiraResponse>x.data).issues.map((z) => {
                 return { key: z.key, parent: z.fields['parent']['key'] }
@@ -77,9 +62,9 @@ export default class Initiativ {
         })
         return result;
     }
-
-    public async initiativ(labels: string[]) {
+    public async execute(labels: string[]) {
         let result: object = {}
+        let chartIssues: string[] = []
         const epics: JiraIssue[] = (<JiraResponse>(await this.getEpicsWithlabels(labels)).data).issues;
         const epicStories: AxiosResponse[] = (await this.fetchAllEpicChildren(epics));
         const storySubTasks: object = this.getStorySubTasks((await this.featchAllChildren(epicStories)))
@@ -87,6 +72,7 @@ export default class Initiativ {
         epicStories.map((issue) => {
             const stories: JiraIssue[] = (<JiraResponse>(<JiraResponse>issue.data)).issues;
             stories.map((i) => {
+                chartIssues.push(i.key)
                 if (!result.hasOwnProperty(i.fields[this.epicLinkfieldId])) {
                     result[i.fields[this.epicLinkfieldId]] = []
                 }
@@ -98,14 +84,15 @@ export default class Initiativ {
                 }
             })
         })
+        const charJql: string = `issuekey in (${chartIssues.toString()}) ORDER BY status ASC`
 
         //console.log(inspect({ initiatives: labels, tree: result }, false, null))
-        await this.saveToConfluence({ initiatives: labels, tree: result })
+        await this.saveToConfluence({ initiatives: labels, tree: result, charJql: charJql, excludeStatus: this.excludeStatus.join() }, labels.toString())
     }
 
-    async saveToConfluence(data: object): Promise<void> {
+    async saveToConfluence(data: object, title: string): Promise<void> {
         const template = new Template();
-        template.setPageTitle('Initiativ overview');
+        template.setPageTitle(`Initiativ: ${title}`);
         template.setParentId(config.get('confluence')['space']['rootPageId']);
         template.setTemplatePath(`${this.cwd}/template.hbs`);
         template.setSpaceKey(config.get('confluence')['space']['key']);

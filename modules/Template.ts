@@ -3,6 +3,7 @@ import Handlebars from 'handlebars';
 import Confluence from './confluence/Confluence.js';
 import JiraIssueMacro from './confluence/macro/JiraIssue.js';
 import NoteMacro from './confluence/macro/Note.js';
+import JiraChartMacro from './confluence/macro/JiraChart.js';
 import fs from 'fs';
 
 Handlebars.registerHelper('jiraIssueMacro', (aString) => {
@@ -11,6 +12,10 @@ Handlebars.registerHelper('jiraIssueMacro', (aString) => {
 
 Handlebars.registerHelper('noteMacro', (title,content) => {
   return NoteMacro.generate(title,content)
+})
+
+Handlebars.registerHelper('jiraChartMacro', (jql:string) => {
+  return JiraChartMacro.generate(jql)
 })
 
 /**

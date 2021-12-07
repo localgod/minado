@@ -7,42 +7,42 @@ import Prefixed from './prefixed_issues/index.js';
 import Labels from './labels/index.js';
 import Initiativ from './initiativ/index.js';
 
-function jira() {
-    const h = new Command('jira')
-    h.description('Jira operations')
+const jira: Function = () => {
+  const h = new Command('jira')
+  h.description('Jira operations')
 
+  h.command('epicOverview').description('Epic overview').action(() => {
+    const p = new EpicOverview();
+    p.execute();
+  });
 
-    h.command('epicOverview').description('Epic overview').action(() => {
-      const p = new EpicOverview();
-      p.execute();
-    });
-    
-    h.command('prefixes').description('List all jira prefixes').action(() => {
-      const p = new Prefixed();
-      p.execute();
-    })
-    
-    h.command('labels').description('List all jira labels').action(() => {
-      const p = new Labels();
-      p.execute();
-    })
-    
-    h.command('fields').description('List all jira fields').action(async () => {
-      const jira = new Jira(config.get('jira'));
-      const t:string = await jira.getFieldIdByName('Epic Link');
-    })
+  h.command('prefixes').description('List all jira prefixes').action(() => {
+    const p = new Prefixed();
+    p.execute();
+  })
 
-    h.command('status').description('List all jira status').action(async () => {
-      const s = new Status();
-      console.log(await s.status());
-      
-    })
-    h.command('initiativ').description('List initiativ').action(async () => {
-      const s = new Initiativ();
-      await s.initiativ(['Supersubscription'])
-      
-    })
-    return h;
+  h.command('labels').description('List all jira labels').action(() => {
+    const p = new Labels();
+    p.execute();
+  })
+
+  h.command('fields').description('List all jira fields').action(async () => {
+    const jira = new Jira(config.get('jira'));
+    const t: string = await jira.getFieldIdByName('Epic Link');
+  })
+
+  h.command('status').description('List all jira status').action(async () => {
+    const s = new Status();
+    console.log(await s.status());
+
+  })
+
+  h.command('initiativ').description('List initiativ').requiredOption('-l --labels <label>').action(async (options) => {
+    const s = new Initiativ();
+    await s.execute(options.labels.split(','));
+
+  })
+  return h;
 }
 
 export { jira }

@@ -9,7 +9,7 @@ export default class Note {
    * @param {string} content - Content  for the note
    * @return {string}
    */
-  static generate(title, content) {
+  static generate(title:string, content:string): string {
     const macroId = 'e9aa7714-b777-445c-9d98-c3ca6bdd48be';
     return `
     <ac:structured-macro

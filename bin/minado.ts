@@ -7,4 +7,4 @@ const program = new Command();
 program.addCommand(db());
 program.addCommand(dummy());
 program.addCommand(jira());
-program.parse(process.argv);
+program.parseAsync(process.argv);

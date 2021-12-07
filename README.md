@@ -23,3 +23,9 @@ Commands:
     fields            List all jira fields
   help [command]  display help for command
 ```
+
+# Example
+
+```bash
+node ./bin/minado.js jira initiativ -l somelabel,someotherlabel
+```
