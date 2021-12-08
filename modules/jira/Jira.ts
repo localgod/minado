@@ -1,5 +1,6 @@
 'use strict';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import { ServerResponse } from 'http';
 import Logger from '../Logger.js';
 
 const MAX_REQUESTS_COUNT: number = 25;
@@ -26,14 +27,39 @@ interface JiraIssue {
   fields: object
 }
 
-export { JiraResponse, JiraIssue }
+interface JiraProject {
+  expand: string,
+  self: string,
+  id: number,
+  key: string,
+  description: string,
+  lead: {
+    self: string,
+    key: string,
+    name: string,
+    avatarUrls: object,
+    displayName: string,
+    active: true
+  },
+  components: object[],
+  issueTypes: object[],
+  url: string,
+  assigneeType: string,
+  versions: object[],
+  name: string,
+  roles: object,
+  avatarUrls: object,
+  projectTypeKey: string,
+  archived: false
+}
+
+export { JiraResponse, JiraIssue, JiraProject }
 
 export default class Jira {
 
   private log: Logger;
   private axios: AxiosInstance;
   private config: object;
-
   constructor(config: object) {
     if (typeof config != 'object') {
       throw new Error('No config object provide for jira');
@@ -73,64 +99,68 @@ export default class Jira {
     });
   }
 
-   async fetch(jql: string, offset: number, limit: number, fields: Array<string>): Promise<AxiosResponse<any, any>> {
-    try {
-      const data: object = {
-        'jql': jql,
-        'startAt': offset,
-        'maxResults': limit,
-        'fields': fields,
-      };
-      return await this.axios.post(`rest/api/2/search`, data);
-    } catch (error) {
-      console.error(error)
-    }
+  async fetch(jql: string, offset: number, limit: number, fields: Array<string>): Promise<AxiosResponse<any, any>> {
+    const data: object = {
+      'jql': jql,
+      'startAt': offset,
+      'maxResults': limit,
+      'fields': fields,
+    };
+    return this.axios.post(`rest/api/2/search`, data).then((response: AxiosResponse) => {
+      return response;
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.errorMessages.join())
+      process.exit(1)
+    })
+  }
+
+  async getProject(key: string): Promise<JiraProject> {
+    return this.axios.get(`rest/api/2/project/${key}`).then((response: AxiosResponse) => {
+      return response.data
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.errorMessages.join())
+      process.exit(1)
+    })
+
   }
 
   async getIssue(key: string, fields: Array<any>): Promise<JiraIssue> {
-    try {
-      return (<JiraIssue>(<JiraIssue[]>(<JiraResponse>(<AxiosResponse>await this.fetch(`issuekey = ${key}`, 0, 1, fields)).data).issues)[0]);
-    } catch (error) {
-      console.error(error)
-    }
+    return this.fetch(`issuekey = ${key}`, 0, 1, fields).then((response: AxiosResponse) => {
+      return <JiraIssue>(<JiraIssue[]>(<JiraResponse>response.data).issues)[0]
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.errorMessages.join())
+      process.exit(1)
+    })
   }
 
   async countIssues(jql: string): Promise<number> {
-    try {
-      const data: object = {
-        'jql': jql,
-        'startAt': 0,
-        'maxResults': 1,
-        'fields': ['summary'],
-      };
-      return this.axios.post(`rest/api/2/search`, data).then((response) => {
-        return response.data.total;
-      });
-    } catch (error) {
-      console.error(error)
-    }
+    return this.fetch(jql, 0, 1, ['summary']).then((response: AxiosResponse) => {
+      return response.data.total;
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.errorMessages.join())
+      process.exit(1)
+    })
   }
 
-  async getFieldIdByName(name: string): Promise<any> {
+  async getFieldIdByName(name: string): Promise<string> {
     try {
-      const fields: object[] = (await this.getFields()).data;
-
-      const t: object[] = fields.filter((field: object) => { return field['name'] === name });
-      if (t[0] !== undefined) {
-        return t[0]['id'];
-      } else {
-        throw new Error(`Issue with name '${name}' was not found in list of issues.`)
+      const id: string = (<object[]>await this.getFields()).filter((field: object) => field['name'] === name)[0]['id']
+      if (id === undefined) {
+        throw new Error(`Issue with name '${name}' was not found in list of issues.`);
       }
+      return id;
     } catch (error) {
-      console.error(error)
+      this.log.error(error.message)
+      process.exit(1)
     }
   }
 
-  async getFields(): Promise<AxiosResponse<any, any>> {
-    try {
-      return await this.axios.get(`rest/api/2/field`);
-    } catch (error) {
-      console.error(error)
-    }
+  async getFields(): Promise<object[]> {
+    return this.axios.get(`rest/api/2/field`).then((response: AxiosResponse) => {
+      return response.data
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.errorMessages.join())
+      process.exit(1)
+    })
   }
 }

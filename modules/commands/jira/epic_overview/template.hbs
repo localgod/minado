@@ -1,9 +1,10 @@
 {{{ noteMacro "Generated" "This page as generated. Any manual edits will be lost." }}}
 <table>
-  <colgroup>
-    <col />
-    <col />
-  </colgroup>
+  <caption>
+    {{#each projects}}
+    {{{ this.lead.name }}}<br />
+    {{/each}}
+  </caption>
   <tbody>
     <tr>
       <th>Epic</th>
@@ -16,7 +17,7 @@
       </td>
       <td>
         {{#each this}}
-        {{{ jiraIssueMacro this }}}<br/>
+        {{{ jiraIssueMacro this }}}<br />
         {{/each}}
       </td>
     </tr>

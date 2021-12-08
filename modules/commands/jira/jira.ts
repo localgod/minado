@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import config from "config";
-import Jira from "../../jira/Jira.js";
+import Jira, { JiraProject } from "../../jira/Jira.js";
 import EpicOverview from "./epic_overview/index.js";
 import Status from "./status/index.js";
 import Prefixed from './prefixed_issues/index.js';
@@ -11,9 +11,9 @@ const jira: Function = () => {
   const h = new Command('jira')
   h.description('Jira operations')
 
-  h.command('epicOverview').description('Epic overview').action(() => {
+  h.command('epicOverview').description('Epic overview').requiredOption('-p --projects <project>', 'Comma separated list of project keys').action(async (options) => {
     const p = new EpicOverview();
-    p.execute();
+    p.execute(options.projects.split(','));
   });
 
   h.command('prefixes').description('List all jira prefixes').action(() => {
@@ -41,6 +41,13 @@ const jira: Function = () => {
     const s = new Initiativ();
     await s.execute(options.labels.split(','));
 
+  })
+
+
+  h.command('project').description('List project info').requiredOption('-p --project <project>').action(async (options) => {
+    const jira: Jira = new Jira(config.get('jira'));
+    const t: JiraProject = await jira.getProject(options.project)
+    console.log(t.lead.name)
   })
   return h;
 }
