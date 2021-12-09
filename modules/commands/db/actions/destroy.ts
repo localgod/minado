@@ -1,18 +1,19 @@
 import { Command } from "commander";
-import Nano from 'nano'
+import CouchDB from '../../../couchdb/CouchDb.js';
 
 function destroy() {
+    const c: CouchDB = new CouchDB();
     const h = new Command('destroy');
     h.description('Destroy database')
     h.argument('<dbname>', 'Name of the database to destroy');
     h.action(async (dbname) => {
-        const nano: Nano.ServerScope = Nano(`http://${process.env.COUCHDB_USER}:${process.env.COUCHDB_PASSWORD}@127.0.0.1:5984`);
-        const result = await nano.db.destroy(dbname)
-        if (result['ok']) {
-            console.log(`'${dbname}' destroyed`)
-        } else {
-            console.log(`'${dbname}' not destroyed`)
-        }
+        c.destroyDatabase(dbname).then((response) => {
+            if (response['ok']) {
+                console.log(`Database '${dbname}' destroyed`);
+            } else {
+                console.log(`Database '${dbname}' was not destroyed`);
+            }
+        })
     })
     return h;
 }

@@ -97,11 +97,6 @@ export default class CouchDB {
     return response.docs;
   }
 
-
-
-
-
-
   /**
    * Find prefixed issues
    * @returns {Promise}
