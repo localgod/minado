@@ -72,7 +72,6 @@ export default class Confluence {
     return this.axios.get(
       `/rest/api/content?spaceKey=${space}&title=${title.trim()}&expand=version`,
     ).then((response: AxiosResponse) => {
-      console.log(inspect(response.data, false, null))
       return response.data;
     }).catch((error: AxiosError) => {
       this.log.error(error.response.data.message)

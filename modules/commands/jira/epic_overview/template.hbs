@@ -1,7 +1,7 @@
 <ac:layout>
   <ac:layout-section ac:type="two_right_sidebar">
     <ac:layout-cell>
-      {{{ noteMacro "Generated" "This page as generated. Any manual edits will be lost." }}}
+
       <table>
         <thead>
           <tr>
@@ -25,16 +25,26 @@
         </tbody>
         <tfoot>
           <tr>
-            <th colspan="2">The following statuses has been omitted: Closed,Done,Resolved,Cancelled</th>
+            <th colspan="2"></th>
           </tr>
         </tfoot>
       </table>
     </ac:layout-cell>
     <ac:layout-cell>
-      {{#each projects}}
-      {{{ this.name }}} | Lead: {{{ this.lead.name }}}<br />
-      {{/each}}
-      <hr />
+      {{{ noteMacro "Generated" "This page was generated. Any manual edits will be lost." }}}
+      <table>
+        <tr>
+          <th>The following statuses has been omitted</th>
+          <td>Closed,Done,Resolved,Cancelled</td>
+        </tr>
+        <tr>
+          <th>Project(s)</th>
+          <td><ul> {{#each projects}}
+            <li>{{{ this.name }}} | Lead: {{{ this.lead.name }}}</li>
+            {{/each}}
+            </ul></td>
+        </tr>
+      </table>
       {{{ jiraChartMacro chart }}}
     </ac:layout-cell>
   </ac:layout-section>
