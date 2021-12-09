@@ -16,57 +16,46 @@ export default class EpicOverview {
   }
 
   async execute(projects: string[]): Promise<void> {
-    try {
+    const p: JiraProject[] = await this.getProjectInfo(projects);
+    const chart: string[] = []
 
-      const p: JiraProject[] = await this.getProjectInfo(projects);
+    const issues = (await Promise.all((<string[]>await this.fetchEpics(projects)).map((issue: string) => this.fetchEpicChildren(issue)))).flat();
+    const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));
+    const result = {}
+    issues.forEach((issue: JiraIssue) => {
+      chart.push(issue.key)
+      if (!result.hasOwnProperty(issue.fields[epicLinkfieldId])) {
+        result[issue.fields[epicLinkfieldId]] = [issue.key];
+      } else {
+        result[issue.fields[epicLinkfieldId]].push(issue.key);
+      }
+    })
+    const j:any = (<string[]>p.map((project) => project.name)).join()
+     
 
-      const issues = (await Promise.all((<string[]>await this.fetchEpics(projects)).map((issue: string) => this.fetchEpicChildren(issue)))).flat();
-      const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));
-      const result = {}
-      issues.forEach((issue: JiraIssue) => {
-        if (!result.hasOwnProperty(issue.fields[epicLinkfieldId])) {
-          result[issue.fields[epicLinkfieldId]] = [issue.key];
-        } else {
-          result[issue.fields[epicLinkfieldId]].push(issue.key);
-        }
-      })
-      await this.saveToConfluence({ epics: result, projects: p });
-    } catch (error) {
-      console.error(error)
-    }
+    const charJql: string = `issuekey in (${chart.toString()}) ORDER BY status ASC`
+    await this.saveToConfluence({ epics: result, projects: p, chart: charJql }, j);
   }
 
   private async getProjectInfo(projects: string[]): Promise<JiraProject[]> {
-    try {
-      return await Promise.all(projects.map((key) => this.jira.getProject(key.toUpperCase())))
-    } catch (error) {
-      console.error(error)
-    }
+    return await Promise.all(projects.map((key) => this.jira.getProject(key.toUpperCase())))
   }
 
   private async fetchEpics(projects: string[]): Promise<string[]> {
-    try {
-      const jql: string = `project IN(${projects.join()}) AND issuetype = epic AND status != closed ORDER BY status ASC`;
-      const epics: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
-      return epics.map((issue: object) => issue['key']).sort()
-    } catch (error) {
-      console.error(error);
-    }
+    const jql: string = `project IN(${projects.join()}) AND issuetype = epic AND status != closed ORDER BY status ASC`;
+    const epics: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
+    return epics.map((issue: object) => issue['key']).sort()
   }
 
   private async fetchEpicChildren(epic: string): Promise<object[]> {
-    try {
-      const jql: string = `"epic link" = ${epic} and status not in (closed, Done, Resolved, Cancelled) order by status ASC`;
-      const children: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
-      return children.map((entity: object) => { return { 'key': entity['key'], 'fields': entity['fields'] } });
-    } catch (error) {
-      console.error(error);
-    }
+    const jql: string = `"epic link" = ${epic} and status not in (closed, Done, Resolved, Cancelled) order by status ASC`;
+    const children: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
+    return children.map((entity: object) => { return { 'key': entity['key'], 'fields': entity['fields'] } });
   }
 
-  private async saveToConfluence(data: object): Promise<void> {
+  private async saveToConfluence(data: object, title: string): Promise<void> {
     const template = new Template();
-    template.setPageTitle('Epic overview');
+    template.setPageTitle(`Epic Overview - ${title}`);
     template.setParentId(config.get('confluence')['space']['rootPageId']);
     template.setTemplatePath(`${this.cwd}/template.hbs`);
     template.setSpaceKey(config.get('confluence')['space']['key']);

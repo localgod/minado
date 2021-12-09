@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import Logger from '../Logger.js';
 /**
  * Confluence access object
@@ -37,7 +37,12 @@ export default class Confluence {
    */
   async createPage(space: string, ancestor: number, title: string, content: string): Promise<AxiosResponse<any, any>> {
     const data = this.marshal(space, title, ancestor, content);
-    return this.axios.post(`/rest/api/content`, data);
+    return this.axios.post(`/rest/api/content`, data).then((response: AxiosResponse) => {
+      return response;
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.message)
+      process.exit(1)
+    })
   }
 
   /**
@@ -51,7 +56,12 @@ export default class Confluence {
    */
   async updatePage(space: string, ancestor: number, title: string, id: number, version: number, content: string): Promise<AxiosResponse<any, any>> {
     const data = this.marshal(space, title, ancestor, content, version);
-    return this.axios.put(`/rest/api/content/${id}`, data);
+    return this.axios.put(`/rest/api/content/${id}`, data).then((response: AxiosResponse) => {
+      return response;
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.errorMessages.join())
+      process.exit(1)
+    })
   }
 
   /**
@@ -61,8 +71,13 @@ export default class Confluence {
    */
   async getPage(space: string, title: string): Promise<AxiosResponse<any, any>> {
     return this.axios.get(
-      `/rest/api/content?spaceKey=${space}&title=${title}&expand=version`,
-    );
+      `/rest/api/content?spaceKey=${space}&title=${title.trim()}&expand=version`,
+    ).then((response: AxiosResponse) => {
+      return response;
+    }).catch((error: AxiosError) => {
+      this.log.error(error.response.data.message)
+      process.exit(1)
+    })
   }
 
   /**
@@ -73,6 +88,8 @@ export default class Confluence {
    * @param {string} content - Page content
    */
   async store(space: string, ancestor: number, title: string, content: string): Promise<void> {
+
+    
     return this.getPage(space, title).then((response) => {
       if (response.data.results.length == 0) {
         this.createPage(space, ancestor, title, content).then((response) => {
@@ -100,6 +117,7 @@ export default class Confluence {
     }).catch((error) => {
       console.error(error);
     });
+    
   }
 
   /**
