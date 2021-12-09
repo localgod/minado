@@ -59,7 +59,7 @@ export default class Confluence {
     return this.axios.put(`/rest/api/content/${id}`, data).then((response: AxiosResponse) => {
       return response;
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.errorMessages.join())
+      this.log.error(error.response.data.message)
       process.exit(1)
     })
   }
@@ -87,9 +87,7 @@ export default class Confluence {
    * @param {string} title - Page title
    * @param {string} content - Page content
    */
-  async store(space: string, ancestor: number, title: string, content: string): Promise<void> {
-
-    
+  async store(space: string, ancestor: number, title: string, content: string): Promise<void> {  
     return this.getPage(space, title).then((response) => {
       if (response.data.results.length == 0) {
         this.createPage(space, ancestor, title, content).then((response) => {
@@ -116,8 +114,7 @@ export default class Confluence {
       }
     }).catch((error) => {
       console.error(error);
-    });
-    
+    }); 
   }
 
   /**
