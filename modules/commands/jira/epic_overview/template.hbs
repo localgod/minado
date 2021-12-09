@@ -1,26 +1,41 @@
-{{{ noteMacro "Generated" "This page as generated. Any manual edits will be lost." }}}
-<table>
-  <caption>
-    {{#each projects}}
-    {{{ this.lead.name }}}<br />
-    {{/each}}
-  </caption>
-  <tbody>
-    <tr>
-      <th>Epic</th>
-      <th>Stories</th>
-    </tr>
-    {{#each epics}}
-    <tr>
-      <td>
-        {{{ jiraIssueMacro @key }}}
-      </td>
-      <td>
-        {{#each this}}
-        {{{ jiraIssueMacro this }}}<br />
-        {{/each}}
-      </td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+<ac:layout>
+  <ac:layout-section ac:type="two_right_sidebar">
+    <ac:layout-cell>
+      {{{ noteMacro "Generated" "This page as generated. Any manual edits will be lost." }}}
+      <table>
+        <thead>
+          <tr>
+            <th>Epic</th>
+            <th>Stories</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each epics}}
+          <tr>
+            <td>
+              {{{ jiraIssueMacro @key }}}
+            </td>
+            <td>
+              {{#each this}}
+              {{{ jiraIssueMacro this }}}<br />
+              {{/each}}
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="2">The following statuses has been omitted: Closed,Done,Resolved,Cancelled</th>
+          </tr>
+        </tfoot>
+      </table>
+    </ac:layout-cell>
+    <ac:layout-cell>
+      {{#each projects}}
+      {{{ this.name }}} | Lead: {{{ this.lead.name }}}<br />
+      {{/each}}
+      <hr />
+      {{{ jiraChartMacro chart }}}
+    </ac:layout-cell>
+  </ac:layout-section>
+</ac:layout>
