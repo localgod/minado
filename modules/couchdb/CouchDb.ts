@@ -101,11 +101,11 @@ export default class CouchDB {
    * Find prefixed issues
    * @returns {Promise}
    */
-  public async findPrefixedIssues(): Promise<string[]> {
+  public async findPrefixedIssues(projects: string[]): Promise<string[]> {
     const query = {
       'selector': {
         '_id': {
-          '$gt': null,
+          '$regex': `^(${projects.join('|').toUpperCase()}).*`,
         },
         'summary': {
           '$regex': '^\\[.*\\]',

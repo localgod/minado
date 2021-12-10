@@ -17,13 +17,13 @@ export default class PrefixedIssues {
     this.cwd = `./modules/commands/jira/prefixed_issues`;
   }
 
-  async execute(): Promise<void> {
+  async execute(projects: string[]): Promise<void> {
     const couch: CouchDB = new CouchDB();
     const template: Template = new Template();
-    template.setPageTitle('Jira prefix overview');
+    template.setPageTitle(`Jira prefix overview - ${projects.join().toUpperCase()}`);
     template.setParentId(config.get('confluence')['space']['rootPageId']);
     template.setTemplatePath(`${this.cwd}/template.hbs`);
     template.setSpaceKey(config.get('confluence')['space']['key']);
-    return template.write({ prefixes: await couch.findPrefixedIssues() });
+    return template.write({ prefixes: await couch.findPrefixedIssues(projects) });
   }
 }

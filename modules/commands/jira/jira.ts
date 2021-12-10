@@ -16,9 +16,9 @@ const jira: Function = () => {
     p.execute(options.projects.split(','));
   });
 
-  h.command('prefixes').description('List all jira prefixes').action(() => {
+  h.command('prefixes').description('List all jira prefixes').requiredOption('-p --projects <project>', 'Comma separated list of project keys').action(async (options) => {
     const p = new Prefixed();
-    p.execute();
+    p.execute(options.projects.split(','));
   })
 
   h.command('labels').description('List all jira labels').action(() => {
