@@ -13,9 +13,9 @@ export default class LabelOverview {
   constructor() {
     this.cwd = `./modules/commands/jira/labels`;
   }
-  async execute(): Promise<void> {
+  async execute(projects: string[]): Promise<void> {
     const couch = new CouchDB();
-    return couch.getLabels().then((response) => {
+    return couch.getLabels(projects).then((response) => {
       const labels = {};
       response.forEach((issue) => {
         issue['labels'].forEach((label: string | number) => {
@@ -35,7 +35,7 @@ export default class LabelOverview {
       b.sort((a, b) => (a.count < b.count) ? 1 : -1);
 
       const template = new Template();
-      template.setPageTitle('Labels overview');
+      template.setPageTitle(`Labels overview - ${projects.join().toUpperCase()}`);
       template.setParentId(config.get('confluence')['space']['rootPageId']);
       template.setTemplatePath(`${this.cwd}/template.hbs`);
       template.setSpaceKey(config.get('confluence')['space']['key']);

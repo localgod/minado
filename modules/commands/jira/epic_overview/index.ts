@@ -30,11 +30,8 @@ export default class EpicOverview {
         result[issue.fields[epicLinkfieldId]].push(issue.key);
       }
     })
-    const j:any = (<string[]>p.map((project) => project.name)).join()
-     
-
     const charJql: string = `issuekey in (${chart.toString()}) ORDER BY status ASC`
-    await this.saveToConfluence({ epics: result, projects: p, chart: charJql }, j);
+    await this.saveToConfluence({ epics: result, projects: p, chart: charJql }, projects.join().toUpperCase());
   }
 
   private async getProjectInfo(projects: string[]): Promise<JiraProject[]> {

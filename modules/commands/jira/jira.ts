@@ -21,9 +21,9 @@ const jira: Function = () => {
     p.execute(options.projects.split(','));
   })
 
-  h.command('labels').description('List all jira labels').action(() => {
+  h.command('labels').description('List all jira labels').requiredOption('-p --projects <project>', 'Comma separated list of project keys').action( async (options) => {
     const p = new Labels();
-    p.execute();
+    p.execute(options.projects.split(','));
   })
 
   h.command('fields').description('List all jira fields').action(async () => {
@@ -42,7 +42,6 @@ const jira: Function = () => {
     await s.execute(options.labels.split(','));
 
   })
-
 
   h.command('project').description('List project info').requiredOption('-p --project <project>').action(async (options) => {
     const jira: Jira = new Jira(config.get('jira'));

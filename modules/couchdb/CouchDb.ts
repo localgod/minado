@@ -21,11 +21,11 @@ export default class CouchDB {
   /**
    * Get labels
    */
-  public async getLabels(): Promise<object[]> {
+  public async getLabels(projects: string[]): Promise<object[]> {
     const query = {
       'selector': {
         '_id': {
-          '$gt': null,
+          '$regex': `^(${projects.join('|').toUpperCase()}).*`,
         },
         'labels': {
           '$ne': [],
