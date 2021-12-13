@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import config from 'config';
-import Jira, { JiraIssue, JiraResponse, JiraProject } from '../../../jira/Jira.js';
-import Template from '../../../Template.js';
+import Jira, { JiraIssue, JiraResponse, JiraProject } from '../../../../jira/Jira.js';
+import Template from '../../../../Template.js';
 /**
  * Generate a epic overview and publish it to Confluence
  */
@@ -22,7 +22,7 @@ export default class EpicOverview {
     const issues = (await Promise.all((<string[]>await this.fetchEpics(projects)).map((issue: string) => this.fetchEpicChildren(issue)))).flat();
     const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));
     const result = {}
-    issues.forEach((issue: JiraIssue) => {
+    issues.forEach((issue: JiraIssue): void => {
       chart.push(issue.key)
       if (!result.hasOwnProperty(issue.fields[epicLinkfieldId])) {
         result[issue.fields[epicLinkfieldId]] = [issue.key];

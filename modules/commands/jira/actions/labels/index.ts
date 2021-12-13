@@ -1,5 +1,5 @@
-import Template from '../../../Template.js';
-import CouchDB from '../../../couchdb/CouchDb.js';
+import Template from '../../../../Template.js';
+import CouchDB from '../../../../couchdb/CouchDb.js';
 import config from 'config';
 /**
  * Generate a epic overview and publish it to Confluence

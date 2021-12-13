@@ -1,9 +1,7 @@
 import config from 'config';
-import Jira from '../../../jira/Jira.js';
-import Logger from '../../../Logger.js';
-import JiraIssueMacro from '../../../confluence/macro/JiraIssue.js';
-import NoteMacro from '../../../confluence/macro/Note.js';
-import Template from '../../../Template.js';
+import Jira from '../../../../jira/Jira.js';
+import Logger from '../../../../Logger.js';
+import Template from '../../../../Template.js';
 /**
  * Generate a epic overview and publish it to Confluence
  */
@@ -23,7 +21,6 @@ export default class Status {
     this.jira = new Jira(config.get('jira'));
 
   }
-
 
   private async getAllIssues() {
     const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));

@@ -1,9 +1,8 @@
 import config from 'config';
-import Jira, { JiraIssue, JiraResponse } from '../../../jira/Jira.js';
-import Logger from '../../../Logger.js';
-import Template from '../../../Template.js';
+import Jira, { JiraIssue, JiraResponse } from '../../../../jira/Jira.js';
+import Logger from '../../../../Logger.js';
+import Template from '../../../../Template.js';
 import { AxiosResponse } from 'axios';
-import { inspect } from 'util'
 
 interface InitiativResult {
     initiatives: string[],
@@ -48,7 +47,7 @@ export default class Initiativ {
         const requests: Promise<AxiosResponse<any, any>>[] = epics.map((issue) => { return this.fetchEpicChildren(issue.key); })
         return (await Promise.all(requests));
     }
-    getStorySubTasks(storySubTasks: AxiosResponse[]): object {
+    private getStorySubTasks(storySubTasks: AxiosResponse[]): object {
         const result: object = []
         storySubTasks.map((x) => {
             return (<JiraResponse>x.data).issues.map((z) => {
@@ -86,7 +85,6 @@ export default class Initiativ {
         })
         const charJql: string = `issuekey in (${chartIssues.toString()}) ORDER BY status ASC`
 
-        //console.log(inspect({ initiatives: labels, tree: result }, false, null))
         await this.saveToConfluence({ initiatives: labels, tree: result, charJql: charJql, excludeStatus: this.excludeStatus.join() }, labels.toString())
     }
 

@@ -11,16 +11,18 @@ export default class CouchDB {
   private nano: Nano.ServerScope;
 
   /**
-    * Contruct sync task
+    * Contruct Couchdb Wrappper
     * @constructor
     */
   constructor() {
     this.nano = Nano(`http://${process.env.COUCHDB_USER}:${process.env.COUCHDB_PASSWORD}@127.0.0.1:5984`);
   }
 
-  /**
-   * Get labels
-   */
+ /**
+  * Get labels
+  * @param {string} projects projects to search in
+  * @returns {Promise<object[]>}
+  */
   public async getLabels(projects: string[]): Promise<object[]> {
     const query = {
       'selector': {
@@ -40,9 +42,10 @@ export default class CouchDB {
       return { key: issue._id, labels: issue['labels'] };
     });
   }
-
+  
   /**
-   * Get non-closed epics
+   * Fetch epics
+   * @returns {Promise<string[]>}
    */
   public async fetchEpics(): Promise<string[]> {
     const query: Nano.MangoQuery = {
@@ -70,9 +73,11 @@ export default class CouchDB {
     });
   }
 
-  /**
-   * Get non-closed epics
-   */
+/**
+ * Get non-closed epics
+ * @param {string} epic 
+ * @returns {Promise<object[]>}
+ */
   public async fetchEpicChildren(epic: string): Promise<object[]> {
     const jira: Jira = new Jira(config.get('jira'));
     const epicLinkfieldId: string = (await jira.getFieldIdByName('Epic Link'));
@@ -99,7 +104,8 @@ export default class CouchDB {
 
   /**
    * Find prefixed issues
-   * @returns {Promise}
+   * @param {string[]} projects
+   * @returns {Promise<string[]>}
    */
   public async findPrefixedIssues(projects: string[]): Promise<string[]> {
     const query = {
@@ -143,7 +149,7 @@ export default class CouchDB {
     * Add issue
     * @param {string} key     Key
     * @param {object} content Json document
-    * @return {Promise}
+    * @return {Promise<object>}
     */
   async add(key: string, content: Nano.MaybeDocument | Nano.ViewDocument<unknown>): Promise<object> {
     const issues = this.nano.use('issues');

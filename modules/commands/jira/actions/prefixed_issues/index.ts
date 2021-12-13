@@ -1,6 +1,6 @@
 'use strict';
-import CouchDB from '../../../couchdb/CouchDb.js';
-import Template from '../../../Template.js';
+import CouchDB from '../../../../couchdb/CouchDb.js';
+import Template from '../../../../Template.js';
 import config from 'config';
 
 /**

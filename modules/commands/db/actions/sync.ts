@@ -1,22 +1,51 @@
 import { Command } from "commander";
+import Jira, { JiraIssue } from '../../../jira/Jira.js';
+import config from 'config';
 import CouchDB from '../../../couchdb/CouchDb.js';
-import Sync from "../index.js";
 
 function sync() {
-  const c: CouchDB = new CouchDB();
+  const db: CouchDB = new CouchDB();
   const h = new Command('sync').requiredOption('-p --projects <project>', 'Comma separated list of project keys').description('Sync database with Jira').action(async (options) => {
-    const s = new Sync();
-
-    c.createDatabase('issues').then((response) => {
-      if (response['ok']) {
+    db.createDatabase('issues').then(async (response) => {
+      if (response['ok']) { 
         console.log(`Database 'issues' created`);
-        s.execute(options.projects.split(','))
+        const issues: JiraIssue[] = await getJiraIssues(options.projects.split(','))
+        const req = [];
+          issues.forEach((issue) => {
+            req.push(db.add(issue.key, issue.fields));
+          });
+          console.time('Couch storing');
+          Promise.all(req).then(() => {
+            console.timeEnd('Couch storing');
+            console.log(`done`);
+          });     
       } else {
         console.log(`Database 'issues' was not created`);
       }
     })
   });
   return h;
+}
+
+async function getJiraIssues(projects: string[]): Promise<JiraIssue[]> {
+  const jira: Jira = new Jira(config.get('jira'));
+  const fields = [
+    'summary', 'issuetype', 'status', (await jira.getFieldIdByName('Epic Link')), 'labels',
+  ];
+  console.time('Jira fetching');
+  const jql = `project in(${projects.join()}) order by issuekey ASC`;
+  const totalNumberOfissues = await jira.countIssues(jql);
+  const pagesize = 100;
+  let i = 0;
+  const requests = [];
+  while (i < totalNumberOfissues) {
+    requests.push(jira.fetch(jql, i, pagesize, fields)
+      .then((response) => {
+        return response['data']['issues'];
+      }));
+    i = i + pagesize;
+  }
+  return (await Promise.all(requests).then((r) => { console.timeEnd('Jira fetching'); return r; }).catch((error) => { console.log(error); process.exit(1); })).flat()
 }
 
 export { sync };
