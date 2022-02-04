@@ -20,7 +20,7 @@
     "chalk": "^5.0.0",
     "cli-progress": "^3.10.0",
     "commander": "^9.0.0",
-    "config": "^3.3.6",
+    "config": "^3.3.7",
     "handlebars": "^4.7.7",
     "nano": "^9.0.5"
   },
