@@ -19,7 +19,7 @@ export default class EpicOverview {
     const p: JiraProject[] = await this.getProjectInfo(projects);
     const chart: string[] = []
 
-    const issues = (await Promise.all((<string[]>await this.fetchEpics(projects)).map((issue: string) => this.fetchEpicChildren(issue)))).flat();
+    const issues = (await Promise.all((await this.fetchEpics(projects)).map((issue: string) => this.fetchEpicChildren(issue)))).flat();
     const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));
     const result = {}
     issues.forEach((issue: JiraIssue): void => {
@@ -30,7 +30,7 @@ export default class EpicOverview {
         result[issue.fields[epicLinkfieldId]].push(issue.key);
       }
     })
-    const charJql: string = `issuekey in (${chart.toString()}) ORDER BY status ASC`
+    const charJql = `issuekey in (${chart.toString()}) ORDER BY status ASC`
     await this.saveToConfluence({ epics: result, projects: p, chart: charJql }, projects.join().toUpperCase());
   }
 
@@ -39,14 +39,14 @@ export default class EpicOverview {
   }
 
   private async fetchEpics(projects: string[]): Promise<string[]> {
-    const jql: string = `project IN(${projects.join()}) AND issuetype = epic AND status != closed ORDER BY status ASC`;
-    const epics: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
+    const jql = `project IN(${projects.join()}) AND issuetype = epic AND status != closed ORDER BY status ASC`;
+    const epics: JiraIssue[] = (<JiraResponse>(await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
     return epics.map((issue: object) => issue['key']).sort()
   }
 
   private async fetchEpicChildren(epic: string): Promise<object[]> {
-    const jql: string = `"epic link" = ${epic} and status not in (closed, Done, Resolved, Cancelled) order by status ASC`;
-    const children: JiraIssue[] = (<JiraResponse>(<AxiosResponse>await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
+    const jql = `"epic link" = ${epic} and status not in (closed, Done, Resolved, Cancelled) order by status ASC`;
+    const children: JiraIssue[] = (<JiraResponse>(await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
     return children.map((entity: object) => { return { 'key': entity['key'], 'fields': entity['fields'] } });
   }
 

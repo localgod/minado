@@ -25,16 +25,16 @@ export default class Initiativ {
         this.excludeStatus = ['Closed', 'Done', 'Resolved', 'Cancelled']
     }
     private async getEpicsWithlabels(labels: string[]): Promise<AxiosResponse<any, any>> {
-        const jql: string = `issuetype = Epic AND labels IN(${labels.join()}) ORDER BY status ASC`;
+        const jql = `issuetype = Epic AND labels IN(${labels.join()}) ORDER BY status ASC`;
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status'])
     }
     private async fetchEpicChildren(epic: string): Promise<AxiosResponse<any, any>> {
         this.epicLinkfieldId = (await this.jira.getFieldIdByName('Epic Link'));
-        const jql: string = `"epic link" = ${epic} AND status NOT IN (${this.excludeStatus.join()}) ORDER BY status ASC`;
+        const jql = `"epic link" = ${epic} AND status NOT IN (${this.excludeStatus.join()}) ORDER BY status ASC`;
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status', this.epicLinkfieldId])
     }
     private async fetchChildren(parent: string): Promise<AxiosResponse<any, any>> {
-        const jql: string = `parent = ${parent} AND status NOT IN (${this.excludeStatus.join()}) ORDER BY status ASC`;
+        const jql = `parent = ${parent} AND status NOT IN (${this.excludeStatus.join()}) ORDER BY status ASC`;
         return await this.jira.fetch(jql, 0, 1000, ['summary', 'status', 'parent'])
     }
     private async featchAllChildren(epicStories: AxiosResponse[]): Promise<AxiosResponse[]> {
@@ -62,14 +62,14 @@ export default class Initiativ {
         return result;
     }
     public async execute(labels: string[]) {
-        let result: object = {}
-        let chartIssues: string[] = []
+        const result: object = {}
+        const chartIssues: string[] = []
         const epics: JiraIssue[] = (<JiraResponse>(await this.getEpicsWithlabels(labels)).data).issues;
         const epicStories: AxiosResponse[] = (await this.fetchAllEpicChildren(epics));
         const storySubTasks: object = this.getStorySubTasks((await this.featchAllChildren(epicStories)))
 
         epicStories.map((issue) => {
-            const stories: JiraIssue[] = (<JiraResponse>(<JiraResponse>issue.data)).issues;
+            const stories: JiraIssue[] = ((<JiraResponse>issue.data)).issues;
             stories.map((i) => {
                 chartIssues.push(i.key)
                 if (!result.hasOwnProperty(i.fields[this.epicLinkfieldId])) {
@@ -83,7 +83,7 @@ export default class Initiativ {
                 }
             })
         })
-        const charJql: string = `issuekey in (${chartIssues.toString()}) ORDER BY status ASC`
+        const charJql = `issuekey in (${chartIssues.toString()}) ORDER BY status ASC`
 
         await this.saveToConfluence({ initiatives: labels, tree: result, charJql: charJql, excludeStatus: this.excludeStatus.join() }, labels.toString())
     }

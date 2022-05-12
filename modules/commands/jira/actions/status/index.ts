@@ -26,11 +26,11 @@ export default class Status {
     const epicLinkfieldId: string = (await this.jira.getFieldIdByName('Epic Link'));
     const projectKeys: string[] = <string[]>config.get('jira')['projects'];
     //const jql: string = `project in(${projectKeys}) AND status = "Can not do"`;
-    const jql: string = `project in(${projectKeys})`;
+    const jql = `project in(${projectKeys})`;
     const numberOfIssues: number = await this.jira.countIssues(jql);
-    let requests: Promise<any>[] = []
-    let offset: number = 0;
-    let maxPerRequest:number = 100;
+    const requests: Promise<any>[] = []
+    let offset = 0;
+    const maxPerRequest = 100;
 
     Array.from(Array(Math.ceil(numberOfIssues / maxPerRequest))).forEach(() => { 
       requests.push(this.jira.fetch(jql, offset, maxPerRequest, ['status']))
@@ -38,7 +38,7 @@ export default class Status {
     })
     
     return Promise.all(requests).then((response) => {
-      let t:object[] = [];
+      const t:object[] = [];
       response.forEach((resp)=>{
         resp.data.issues.forEach((issue: object)=>{
           t.push(issue);
@@ -50,7 +50,7 @@ export default class Status {
 
   async status():Promise<object> {
     const issues: any = (await this.getAllIssues());
-    let statusList: object = {};
+    const statusList: object = {};
     issues.forEach((issue:object) => {
       const status: string = issue['fields']['status']['name'];
       if (statusList[status] == undefined) {

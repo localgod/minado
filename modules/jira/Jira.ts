@@ -3,9 +3,9 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { ServerResponse } from 'http';
 import Logger from '../Logger.js';
 
-const MAX_REQUESTS_COUNT: number = 25;
-const INTERVAL_MS: number = 10;
-let PENDING_REQUESTS: number = 0;
+const MAX_REQUESTS_COUNT = 25;
+const INTERVAL_MS = 10;
+let PENDING_REQUESTS = 0;
 
 // Regex search example:
 // issueFunction in issueFieldMatch("project = CCOE", "summary", "\\[.*\\].*")
@@ -109,7 +109,7 @@ export default class Jira {
     return this.axios.post(`rest/api/2/search`, data).then((response: AxiosResponse) => {
       return response;
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.errorMessages.join())
+      this.log.error(error.response.data['errorMessages'].join())
       process.exit(1)
     })
   }
@@ -118,7 +118,7 @@ export default class Jira {
     return this.axios.get(`rest/api/2/project/${key}`).then((response: AxiosResponse) => {
       return response.data
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.errorMessages.join())
+      this.log.error(error.response.data['errorMessages'].join())
       process.exit(1)
     })
 
@@ -126,9 +126,9 @@ export default class Jira {
 
   async getIssue(key: string, fields: Array<any>): Promise<JiraIssue> {
     return this.fetch(`issuekey = ${key}`, 0, 1, fields).then((response: AxiosResponse) => {
-      return <JiraIssue>(<JiraIssue[]>(<JiraResponse>response.data).issues)[0]
+      return ((<JiraResponse>response.data).issues)[0]
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.errorMessages.join())
+      this.log.error(error.response.data['errorMessages'].join())
       process.exit(1)
     })
   }
@@ -137,14 +137,14 @@ export default class Jira {
     return this.fetch(jql, 0, 1, ['summary']).then((response: AxiosResponse) => {
       return response.data.total;
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.errorMessages.join())
+      this.log.error(error.response.data['errorMessages'].join())
       process.exit(1)
     })
   }
 
   async getFieldIdByName(name: string): Promise<string> {
     try {
-      const id: string = (<object[]>await this.getFields()).filter((field: object) => field['name'] === name)[0]['id']
+      const id: string = (await this.getFields()).filter((field: object) => field['name'] === name)[0]['id']
       if (id === undefined) {
         throw new Error(`Issue with name '${name}' was not found in list of issues.`);
       }
@@ -159,7 +159,7 @@ export default class Jira {
     return this.axios.get(`rest/api/2/field`).then((response: AxiosResponse) => {
       return response.data
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.errorMessages.join())
+      this.log.error(error.response.data['errorMessages'].join())
       process.exit(1)
     })
   }

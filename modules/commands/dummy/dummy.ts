@@ -7,8 +7,8 @@ import { AxiosResponse } from "axios";
 async function fetchEpicChildren(epic: string): Promise<object[]> {
   try {
     const jira: Jira = new Jira(config.get('jira'));
-    const jql: string = `project in(${(<string[]>this.config['projects']).join()}) and "epic link" = ${epic}`;
-    return (<JiraResponse>(<AxiosResponse>await jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.getFieldIdByName('Epic Link'))])).data).issues.map((entity: object) => {
+    const jql = `project in(${(<string[]>this.config['projects']).join()}) and "epic link" = ${epic}`;
+    return (<JiraResponse>(await jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.getFieldIdByName('Epic Link'))])).data).issues.map((entity: object) => {
       return { 'key': entity['key'], 'fields': entity['fields'] }
     })
 

@@ -39,7 +39,7 @@ export default class Confluence {
     return this.axios.post(`/rest/api/content`, data).then((response: AxiosResponse) => {
       return response.data;
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.message)
+      this.log.error(error.response.data['message'])
       process.exit(1)
     })
   }
@@ -58,7 +58,7 @@ export default class Confluence {
     return this.axios.put(`/rest/api/content/${id}`, data).then((response: AxiosResponse) => {
       return response.data;
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.message)
+      this.log.error(error.response.data['message'])
       process.exit(1)
     })
   }
@@ -74,7 +74,7 @@ export default class Confluence {
     ).then((response: AxiosResponse) => {
       return response.data;
     }).catch((error: AxiosError) => {
-      this.log.error(error.response.data.message)
+      this.log.error(error.response.data['message'])
       process.exit(1)
     })
   }

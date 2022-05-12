@@ -17,11 +17,11 @@ LABEL maintainer="https://github.com/localgod" \
       org.label-schema.url="https://unknown" \
       org.label-schema.usage="https://github.com/localgod/minado#readme"
 
-ARG bash_version=5.1.0-r0
-ARG nodejs_version=14.18.1-r0
+ARG bash_version=5.1.16-r0
+ARG nodejs_version=14.19.0-r0
 ARG gpp_version=10.2.1_pre1-r3
-ARG git_version=2.30.2-r0
-ARG npm_version=14.18.1-r0
+ARG git_version=2.30.3-r0
+ARG npm_version=14.19.0-r0
 ARG make_version=4.3-r0
 ARG jq_version=1.6-r1
 ARG python3_version=3.8.10-r0
@@ -39,4 +39,4 @@ RUN apk --update --no-cache add \
    wget=${wget_version}
 
 RUN npm -g config set user root
-RUN npm install -g npm@8.1.3 typescript@4.5.2
+RUN npm install -g npm@8.10.0 typescript@4.6.4
