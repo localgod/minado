@@ -3,9 +3,21 @@
 # and commit this file to your remote git repository to share the goodness with others.
 
 tasks:
-  - init: |
-      npm install -g npm@8.10.0 
-      nmp install -g typescript@4.6.4
+  - before: |
+      npm install --location=global npm@latest
+      npm install --location=global typescript@latest
+      npm install --location=global markdownlint-cli
       npm install
+    init: |
+      npm run dev
+
+gitConfig:
+  alias.st: status
+  alias.co: checkout
+
+vscode:
+  extensions:
+    - dbaeumer.vscode-eslint
+    - usernamehw.errorlens
 
 

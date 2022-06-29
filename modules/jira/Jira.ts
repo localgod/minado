@@ -1,6 +1,5 @@
 'use strict';
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
-import { ServerResponse } from 'http';
 import Logger from '../Logger.js';
 
 const MAX_REQUESTS_COUNT = 25;

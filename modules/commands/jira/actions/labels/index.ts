@@ -17,7 +17,7 @@ export default class LabelOverview {
     const couch = new CouchDB();
     return couch.getLabels(projects).then((response) => {
       const labels = {};
-      response.forEach((issue) => {
+      response.forEach((issue: { labels: [] }) => {
         issue['labels'].forEach((label: string | number) => {
           if (labels[label] == undefined) {
             labels[label] = 1;

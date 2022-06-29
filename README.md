@@ -1,7 +1,11 @@
 [![CI](https://github.com/localgod/minado/actions/workflows/ci.yml/badge.svg?branch=dependabot%2Fgithub_actions%2Factions%2Fcheckout-3)](https://github.com/localgod/minado/actions/workflows/ci.yml)
 
 # Fauxton
-    http://127.0.0.1:5984/_utils/#
+
+``` bash
+http://127.0.0.1:5984/_utils/#
+```
+
 # Command
 
 ```bash

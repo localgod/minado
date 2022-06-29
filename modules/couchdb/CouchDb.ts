@@ -18,12 +18,12 @@ export default class CouchDB {
     this.nano = Nano(`http://${process.env.COUCHDB_USER}:${process.env.COUCHDB_PASSWORD}@127.0.0.1:5984`);
   }
 
- /**
-  * Get labels
-  * @param {string} projects projects to search in
-  * @returns {Promise<object[]>}
-  */
-  public async getLabels(projects: string[]): Promise<object[]> {
+  /**
+   * Get labels
+   * @param {string} projects projects to search in
+   * @returns {Promise<key: string, labels: string[] []>}
+   */
+  public async getLabels(projects: string[]): Promise<{ key: string, labels: string[] }[]> {
     const query = {
       'selector': {
         '_id': {
@@ -42,7 +42,7 @@ export default class CouchDB {
       return { key: issue._id, labels: issue['labels'] };
     });
   }
-  
+
   /**
    * Fetch epics
    * @returns {Promise<string[]>}
@@ -73,11 +73,11 @@ export default class CouchDB {
     });
   }
 
-/**
- * Get non-closed epics
- * @param {string} epic 
- * @returns {Promise<object[]>}
- */
+  /**
+   * Get non-closed epics
+   * @param {string} epic 
+   * @returns {Promise<object[]>}
+   */
   public async fetchEpicChildren(epic: string): Promise<object[]> {
     const jira: Jira = new Jira(config.get('jira'));
     const epicLinkfieldId: string = (await jira.getFieldIdByName('Epic Link'));

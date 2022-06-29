@@ -5,8 +5,8 @@ function create() {
     const h = new Command('create')
     h.argument('<dbname>', 'Name of the database to create');
     h.description('create database')
-    h.action(async (dbname) => {
-        c.createDatabase(dbname).then((response) => {
+    h.action(async (dbname:string) => {
+        await c.createDatabase(dbname).then((response) => {
             if (response['ok']) {
                 console.log(`Database '${dbname}' created`);
             } else {

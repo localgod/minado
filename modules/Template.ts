@@ -6,11 +6,11 @@ import NoteMacro from './confluence/macro/Note.js';
 import JiraChartMacro from './confluence/macro/JiraChart.js';
 import fs from 'fs';
 
-Handlebars.registerHelper('jiraIssueMacro', (aString) => {
+Handlebars.registerHelper('jiraIssueMacro', (aString: string) => {
   return JiraIssueMacro.generate(aString)
 })
 
-Handlebars.registerHelper('noteMacro', (title,content) => {
+Handlebars.registerHelper('noteMacro', (title: string, content: string) => {
   return NoteMacro.generate(title,content)
 })
 

@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import config from 'config';
 import Jira, { JiraIssue, JiraResponse, JiraProject } from '../../../../jira/Jira.js';
 import Template from '../../../../Template.js';
@@ -35,19 +34,19 @@ export default class EpicOverview {
   }
 
   private async getProjectInfo(projects: string[]): Promise<JiraProject[]> {
-    return await Promise.all(projects.map((key) => this.jira.getProject(key.toUpperCase())))
+    return Promise.all(projects.map((key) => this.jira.getProject(key.toUpperCase())))
   }
 
   private async fetchEpics(projects: string[]): Promise<string[]> {
     const jql = `project IN(${projects.join()}) AND issuetype = epic AND status != closed ORDER BY status ASC`;
     const epics: JiraIssue[] = (<JiraResponse>(await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
-    return epics.map((issue: object) => issue['key']).sort()
+    return epics.map((issue: { key: string }) => issue['key']).sort()
   }
 
   private async fetchEpicChildren(epic: string): Promise<object[]> {
     const jql = `"epic link" = ${epic} and status not in (closed, Done, Resolved, Cancelled) order by status ASC`;
     const children: JiraIssue[] = (<JiraResponse>(await this.jira.fetch(jql, 0, 1000, ['summary', 'status', (await this.jira.getFieldIdByName('Epic Link'))])).data).issues
-    return children.map((entity: object) => { return { 'key': entity['key'], 'fields': entity['fields'] } });
+    return children.map((entity: JiraIssue) => { return { 'key': entity['key'], 'fields': entity['fields'] } });
   }
 
   private async saveToConfluence(data: object, title: string): Promise<void> {

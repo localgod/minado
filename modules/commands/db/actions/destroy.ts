@@ -6,8 +6,8 @@ function destroy() {
     const h = new Command('destroy');
     h.description('Destroy database')
     h.argument('<dbname>', 'Name of the database to destroy');
-    h.action(async (dbname) => {
-        c.destroyDatabase(dbname).then((response) => {
+    h.action(async (dbname: string) => {
+        await c.destroyDatabase(dbname).then((response) => {
             if (response['ok']) {
                 console.log(`Database '${dbname}' destroyed`);
             } else {

@@ -6,9 +6,12 @@
   "main": "bin/minado.js",
   "type": "module",
   "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "copy": "copyfiles ./modules/**/*.hbs dist"
+    "copy": "copyfiles ./modules/**/*.hbs dist",
+    "mdlint": "markdownlint '**/*.md' --ignore node_modules --disable MD013 MD041"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 import Logger from '../Logger.js';
-import { inspect } from 'util'
+
 /**
  * Confluence access object
  */
@@ -37,7 +37,7 @@ export default class Confluence {
   async createPage(space: string, ancestor: number, title: string, content: string): Promise<ConfluencePage> {
     const data = this.marshal(space, title, ancestor, content);
     return this.axios.post(`/rest/api/content`, data).then((response: AxiosResponse) => {
-      return response.data;
+      return response.data as ConfluencePage;
     }).catch((error: AxiosError) => {
       this.log.error(error.response.data['message'])
       process.exit(1)
@@ -56,7 +56,7 @@ export default class Confluence {
   async updatePage(space: string, ancestor: number, title: string, id: number, version: number, content: string): Promise<ConfluencePage> {
     const data = this.marshal(space, title, ancestor, content, version);
     return this.axios.put(`/rest/api/content/${id}`, data).then((response: AxiosResponse) => {
-      return response.data;
+      return response.data as ConfluencePage;
     }).catch((error: AxiosError) => {
       this.log.error(error.response.data['message'])
       process.exit(1)
@@ -72,7 +72,7 @@ export default class Confluence {
     return this.axios.get(
       `/rest/api/content?spaceKey=${space}&title=${title.trim()}&expand=version`,
     ).then((response: AxiosResponse) => {
-      return response.data;
+      return response.data as ConfluenceContentQuery;
     }).catch((error: AxiosError) => {
       this.log.error(error.response.data['message'])
       process.exit(1)
@@ -89,11 +89,11 @@ export default class Confluence {
   async store(space: string, ancestor: number, title: string, content: string): Promise<void> {
     const query = await this.getPage(space, title);
     if (query.size === 0) {
-      this.createPage(space, ancestor, title, content).then((page) => {
+      await this.createPage(space, ancestor, title, content).then((page) => {
         this.log.info(`Created page: ${page._links.base}/${page._links.webui}`);
       })
     } else {
-      this.updatePage(space, ancestor, title, query.results[0].id, query.results[0].version.number, `${content}`)
+      await this.updatePage(space, ancestor, title, query.results[0].id, query.results[0].version.number, `${content}`)
         .then((page) => {
           this.log.info(`Updated page: ${page._links.base}/${page._links.webui}`);
         })

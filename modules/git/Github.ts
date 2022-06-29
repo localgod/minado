@@ -6,11 +6,6 @@ import config from 'config';
  * Git wrapper object
  */
 export default class Github {
-    /**
-     * Contruct github
-     * @constructor
-     */
-    constructor() { }
 
     /**
     * Dummy task
@@ -31,7 +26,7 @@ export default class Github {
             },
         });
 
-        axe.get('/repos').then((response) => {
+        await axe.get('/repos').then((response: { data: { name: string }[] }) => {
             console.log(response.data.map(entry => entry.name));
         }).catch((error) => {
             console.error(error);
