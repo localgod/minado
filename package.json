@@ -22,7 +22,7 @@
     "axios": "^0.27.2",
     "chalk": "^5.0.1",
     "cli-progress": "^3.11.2",
-    "commander": "^9.3.0",
+    "commander": "^9.4.0",
     "config": "^3.3.7",
     "handlebars": "^4.7.7",
     "nano": "^10.0.0"
