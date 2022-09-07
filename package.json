@@ -28,7 +28,7 @@
     "nano": "^10.0.0"
   },
   "devDependencies": {
-    "@types/config": "^0.0.41",
+    "@types/config": "^3.3.0",
     "@types/node": "^18.7.15",
     "@typescript-eslint/parser": "^5.36.2",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
