@@ -25,7 +25,7 @@
     "commander": "^10.0.0",
     "config": "^3.3.9",
     "handlebars": "^4.7.7",
-    "nano": "^10.1.1"
+    "nano": "^10.1.2"
   },
   "devDependencies": {
     "@types/config": "^3.3.0",
