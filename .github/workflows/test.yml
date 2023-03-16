@@ -1,0 +1,27 @@
+name: 'build-test'
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generating OpenApi specifications and Azure API Management policies from Azure Logic App Standard workflows.
+        uses: ./
+        with:
+          tenant: ${{ secrets.AZURE_TENANT_ID }}
+          clientId: ${{ secrets.AZURE_CLIENT_ID }}
+          clientSecret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          sourcesub: ${{ secrets.SOURCE_SUB }}
+          sourcerg: ${{ secrets.SOURCE_RG }}
+          sourceapp: ${{ secrets.SOURCE_APP }}
+          targetsub: ${{ secrets.TARGET_SUB }}
+          targetrg: ${{ secrets.TARGET_RG }}
+          gateway: ${{ secrets.GATEWAY }}
+          keyvault: ${{ secrets.KEYVAULT }}
+          api: ${{ secrets.API }}
+          suffix: ${{ secrets.SUFFIX }}
+          version: 1.0.0
+          title: test
+          env: dev

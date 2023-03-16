@@ -1,14 +1,17 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "module": "es6",
+        "target": "es2021",
+        "module": "esnext",
         "lib": [
-            "ES2021"
+            "ES2021","DOM"
         ],
+        "outDir": "./dist",
+
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "moduleResolution": "Node",
-        "outDir": "./dist/"
+        "resolveJsonModule": true,
+        
     },
     "include": [
         "./**/*"

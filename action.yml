@@ -1,0 +1,56 @@
+name: 'Minado'
+description: 'Tool for generating OpenApi specifications and Azure API Management policies from Azure Logic App Standard workflows'
+author: 'Johannes Skov Frandsen'
+inputs:
+  tenant:
+    required: true
+    description: 'Azure tenant id'
+  clientId:
+    required: true
+    description: 'Azure client id'
+  clientSecret:
+    required: true
+    description: 'Azure client secret'
+  sourcesub:
+    required: true
+    description: 'Source subscription'
+  sourcerg:
+    required: true
+    description: 'Source resource group'
+  targetsub:
+    required: true
+    description: 'Target subscription'
+  targetrg:
+    required: true
+    description: 'Target resource group'
+  sourceapp:
+    required: true
+    description: 'Source logicapp (standard)'
+  gateway:
+    required: true
+    description: 'Target API Gateway'
+  api:
+    required: true
+    description: 'Target API'
+  keyvault:
+    required: true
+    description: 'Target keyvault'
+  suffix:
+    required: true
+    description: 'API siffix'
+  title:
+    required: false
+    description: 'API siffix'
+    default: 'Logic App Standard'
+  version:
+    required: false
+    description: 'Version'
+    default: '1.0.0'
+  env:
+    required: false
+    description: 'Environment'
+    default: 'dev'
+
+runs:
+  using: 'node16'
+  main: 'lib/index.mjs'
