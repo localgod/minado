@@ -33,7 +33,7 @@
     "dependencies": {
         "@actions/core": "^1.10.0",
         "axios": "^1.5.0",
-        "@azure/arm-apimanagement": "^9.0.0",
+        "@azure/arm-apimanagement": "^9.1.0",
         "@azure/identity": "^3.3.0",
         "@azure/keyvault-secrets": "^4.6.0",
         "@openapi-contrib/json-schema-to-openapi-schema": "^2.2.4",
