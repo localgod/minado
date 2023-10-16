@@ -39,7 +39,7 @@
         "@openapi-contrib/json-schema-to-openapi-schema": "^2.2.4",
         "@types/json-schema": "^7.0.13",
         "chalk": "^5.3.0",
-        "commander": "^11.0.0",
+        "commander": "^11.1.0",
         "openapi3-ts": "^4.1.2",
         "xml2js": "^0.6.2"
     }
