@@ -37,7 +37,7 @@
         "@azure/identity": "^3.3.1",
         "@azure/keyvault-secrets": "^4.6.0",
         "@openapi-contrib/json-schema-to-openapi-schema": "^2.2.4",
-        "@types/json-schema": "^7.0.13",
+        "@types/json-schema": "^7.0.14",
         "chalk": "^5.3.0",
         "commander": "^11.1.0",
         "openapi3-ts": "^4.1.2",
