@@ -5,20 +5,20 @@ type WorkflowDefinition = {
   '$schema': string,
   actions: {
     Response: {
-      inputs: Object[],
+      inputs: object[],
       kind: string,
-      runAfter: {},
+      runAfter: object,
       type: string
     }
   },
   contentVersion: string,
-  outputs: {},
+  outputs: object,
   triggers: {
     manual: {
       inputs: {
         method: string,
         relativePath: string,
-        schema: [Object]
+        schema: [object]
       },
       operationOptions?: string,
       kind: string,
