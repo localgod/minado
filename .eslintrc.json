@@ -16,8 +16,6 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "space-before-function-paren": 0,
-        "@typescript-eslint/no-unused-vars": ["error"],
         "@typescript-eslint/no-explicit-any": "off"
     }
 }
