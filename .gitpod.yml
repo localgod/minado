@@ -1,9 +1,3 @@
-
-github:
-  prebuilds:
-    branches: true
-    addComment: true
-    addBadge: true
 tasks:
   - before: |
       curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash

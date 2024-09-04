@@ -1,6 +1,6 @@
 import { ApiManagementClient, ApiCreateOrUpdateParameter, KnownApiType, ApiCreateOrUpdateResponse, KnownContentFormat, KnownProtocol } from '@azure/arm-apimanagement'
 import { DefaultAzureCredential } from '@azure/identity'
-import { ContentObject, MediaTypeObject, OpenApiBuilder, OpenAPIObject, OperationObject, ParameterObject, PathItemObject, RequestBodyObject, ResponseObject, ResponsesObject, SchemaObject, SecuritySchemeObject, ServerObject } from 'openapi3-ts'
+import { ContentObject, MediaTypeObject, OpenApiBuilder, OpenAPIObject, OperationObject, ParameterObject, PathItemObject, RequestBodyObject, ResponseObject, ResponsesObject, SchemaObject, SecuritySchemeObject, ServerObject } from 'openapi3-ts/oas31'
 import { type Workflow } from './azureManagement.mjs'
 type Config = {
   title: string,
