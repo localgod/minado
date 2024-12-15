@@ -16,7 +16,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'latest'
-          node-version-file: 'package.json'
           check-latest: true
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'      
