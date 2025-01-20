@@ -30,7 +30,7 @@
     "dependencies": {
         "@actions/core": "^1.11.1",
         "@azure/arm-apimanagement": "^9.2.0",
-        "@azure/identity": "^4.5.0",
+        "@azure/identity": "^4.6.0",
         "@azure/keyvault-secrets": "^4.9.0",
         "@openapi-contrib/json-schema-to-openapi-schema": "^3.0.3",
         "@types/json-schema": "^7.0.15",
