@@ -34,7 +34,7 @@
         "@azure/keyvault-secrets": "^4.9.0",
         "@openapi-contrib/json-schema-to-openapi-schema": "^3.0.3",
         "@types/json-schema": "^7.0.15",
-        "axios": "^1.8.1",
+        "axios": "^1.8.3",
         "chalk": "^5.4.1",
         "commander": "^13.1.0",
         "openapi3-ts": "^4.4.0",
